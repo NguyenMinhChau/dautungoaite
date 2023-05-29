@@ -1,155 +1,68 @@
 import { actions } from '../app/';
 import routers from '../routers/routers';
-import { axiosUtils, localStoreUtils } from '../utils';
+import { authPost } from '../utils/Axios/axiosInstance';
+import {
+	setStore,
+	getStore,
+	removeStore,
+} from '../utils/localStore/localStore';
 
-export const LoginSV = async (props = {}) => {
-	const { email, password, setIsProcess, setSnackbar, dispatch, history } =
-		props;
-	try {
-		const res = await axiosUtils.authPost('login', {
-			email,
-			password,
-		});
-		setIsProcess(false);
-		await localStoreUtils.setStore({
-			username: res.metadata.user.payment.username,
-			rule: res.metadata.user.payment.rule,
-			email: res.metadata.user.payment.email,
-			createdAt: res.metadata.user.createAt,
-			token: res.metadata.accessToken,
-			id: res.metadata.user._id,
-		});
-		dispatch(
-			actions.setData({
-				currentUser: localStoreUtils.getStore(),
-				form: {
-					username: '',
-					email: '',
-					password: '',
-				},
-			}),
-		);
-		history(
-			res.metadata.user.payment.rule === 'user'
-				? routers.homeUser
-				: routers.dashboard,
-		);
-	} catch (err) {
-		setIsProcess(false);
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
-	}
-};
 export const RegisterSV = async (props = {}) => {
-	const {
-		username,
-		email,
-		password,
-		setIsProcess,
-		setSnackbar,
-		dispatch,
-		history,
-	} = props;
+	const { username, email, password, setIsProcess, history } = props;
 	try {
-		const res = await axiosUtils.authPost('register', {
+		const resPost = await authPost('register', {
 			username,
 			email,
 			password,
 		});
 		setIsProcess(false);
-		alert(res?.message || 'Create successfully');
-		dispatch(
-			actions.setData({
-				form: {
-					username: '',
-					email: '',
-					password: '',
-				},
-			}),
-		);
-		history(`${routers.login}`);
-	} catch (err) {
-		setIsProcess(false);
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error',
-			type: 'error',
-		});
-	}
-};
-export const LogoutSV = async (props = {}) => {
-	const { id, dispatch, history, setSnackbar } = props;
-	try {
-		await axiosUtils.authPost(`logout/${id}`);
-		await localStoreUtils.removeStore();
-		dispatch(
-			actions.setData({
-				currentUser: null,
-				accountMenu: null,
-			}),
-		);
-		history(`${routers.login}`);
-	} catch (err) {
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
-	}
-};
-export const ForgotPasswordSV = async (props = {}) => {
-	const { email, setIsProcess, setSnackbar, dispatch, history } = props;
-	try {
-		const res = await axiosUtils.userGet(`forgot/password/${email}`, {});
-		alert(res?.message || 'Send OTP successfully');
-		setIsProcess(false);
-		dispatch(
-			actions.setData({
-				form: {
-					username: '',
-					email: '',
-					password: '',
-				},
-			}),
-		);
-		history(routers.resetPwdUser);
-	} catch (err) {
-		setIsProcess(false);
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
-	}
-};
-export const ForgotPasswordOTP = async (props = {}) => {
-	const { otpCode, dispatch, history, setIsProcess, setSnackbar } = props;
-	try {
-		setIsProcess(true);
-		const res = await axiosUtils.userPost(`forgot/password/${otpCode}`, {});
-		alert(
-			res?.message ||
-				'Reset password successfully, please check your email new password!',
-		);
-		dispatch(
-			actions.setData({
-				form: {
-					username: '',
-					email: '',
-					password: '',
-				},
-			}),
-		);
+		alert(resPost?.message || 'Đăng kí thành công!');
 		history(routers.login);
 	} catch (err) {
 		setIsProcess(false);
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
+		alert(err?.response?.data?.message || 'Đăng kí thất bại');
+	}
+};
+export const LoginSV = async (props = {}) => {
+	const { email, password, setIsProcess, history, dispatch } = props;
+	try {
+		const resPost = await authPost('login', {
+			email,
+			password,
 		});
+		await setStore({
+			token: resPost?.metadata?.token,
+			username: resPost?.metadata?.user?.username,
+			email: resPost?.metadata?.user?.email,
+			rule: resPost?.metadata?.user?.roles,
+			id: resPost?.metadata?.user?._id,
+		});
+		await dispatch(
+			actions.setData({
+				currentUser: getStore(),
+			}),
+		);
+		setIsProcess(false);
+		alert(resPost?.message || 'Đăng nhập thành công!');
+		history(routers.chat);
+	} catch (err) {
+		setIsProcess(false);
+		alert(err?.response?.data?.message || 'Đăng nhập thất bại');
+	}
+};
+export const LogoutSV = async (props = {}) => {
+	const { email, history, dispatch } = props;
+	try {
+		const resPost = await authPost(`logout/${email}`, {});
+		await removeStore();
+		await dispatch(
+			actions.setData({
+				currentUser: getStore(),
+			}),
+		);
+		alert(resPost?.message || 'Đăng xuất thành công!');
+		history(routers.login);
+	} catch (err) {
+		alert(err?.response?.data?.message || 'Đăng xuất thất bại');
 	}
 };

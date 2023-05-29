@@ -6,67 +6,63 @@ const URL_SERVER =
 
 // AUTHENTICATION
 export const authInstance = axios.create({
-	baseURL: `${URL_SERVER}/authentication/`,
-	withCredentials: true,
+	baseURL: `${URL_SERVER}/auth/`,
 });
-export const authPost = async (path, options = {}) => {
-	const res = await authInstance.post(path, options);
+export const authPost = async (path, options = {}, others = {}) => {
+	const res = await authInstance.post(path, options, others);
 	return res.data;
 };
 // REFRESH TOKEN
-export const refreshToken = async (path, options = {}) => {
-	const res = await authInstance.post(path, options);
+export const refreshToken = async (path, options = {}, others = {}) => {
+	const res = await authInstance.post(path, options, others);
 	return res.data;
 };
 // ADMIN
 export const adminInstance = axios.create({
 	baseURL: `${URL_SERVER}/admin/`,
-	withCredentials: true,
 });
-export const adminGet = async (path, options = {}) => {
-	const res = await adminInstance.get(path, options);
+export const adminGet = async (path, options = {}, others = {}) => {
+	const res = await adminInstance.get(path, options, others);
 	return res.data;
 };
-export const adminPost = async (path, options = {}) => {
-	const res = await adminInstance.post(path, options);
+export const adminPost = async (path, options = {}, others = {}) => {
+	const res = await adminInstance.post(path, options, others);
 	return res.data;
 };
-export const adminPut = async (path, options = {}) => {
-	const res = await adminInstance.put(path, options);
+export const adminPut = async (path, options = {}, others = {}) => {
+	const res = await adminInstance.put(path, options, others);
 	return res.data;
 };
-export const adminDelete = async (path, options = {}) => {
-	const res = await adminInstance.delete(path, options);
+export const adminDelete = async (path, options = {}, others = {}) => {
+	const res = await adminInstance.delete(path, options, others);
 	return res.data;
 };
 // USERS
 export const userInstance = axios.create({
-	baseURL: `${URL_SERVER}/users/`,
-	withCredentials: true,
+	baseURL: `${URL_SERVER}/user/`,
 });
-export const userGet = async (path, options = {}) => {
-	const res = await userInstance.get(path, options);
+export const userGet = async (path, options = {}, others = {}) => {
+	const res = await userInstance.get(path, options, others);
 	return res.data;
 };
-export const userPost = async (path, options = {}) => {
-	const res = await userInstance.post(path, options);
+export const userPost = async (path, options = {}, others = {}) => {
+	const res = await userInstance.post(path, options, others);
 	return res.data;
 };
 export const userPut = async (path, options = {}, others = {}) => {
 	const res = await userInstance.put(path, options, others);
 	return res.data;
 };
-export const userDelete = async (path, options = {}) => {
-	const res = await userInstance.delete(path, options);
+export const userDelete = async (path, options = {}, others = {}) => {
+	const res = await userInstance.delete(path, options, others);
 	return res.data;
 };
 // COINS
 export const coinInstance = axios.create({
 	baseURL: `${URL_SERVER}/coin/`,
-	withCredentials: true,
 });
-export const coinGet = async (path, options = {}) => {
-	const res = await coinInstance.get(path, options);
+export const coinGet = async (path, options = {}, others = {}) => {
+	const res = await coinInstance.get(path, options, others);
 	return res.data;
 };
 export const coinPost = async (path, options = {}, others = {}) => {
@@ -84,11 +80,9 @@ export const coinDelete = async (path, options = {}, others = {}) => {
 // COINS INACTIVE
 export const coinNAInstance = axios.create({
 	baseURL: `${URL_SERVER}/CoinNA/`,
-	// baseURL: 'http://localhost:8000/coins/',
-	withCredentials: true,
 });
-export const coinNAGet = async (path, options = {}) => {
-	const res = await coinNAInstance.get(path, options);
+export const coinNAGet = async (path, options = {}, others = {}) => {
+	const res = await coinNAInstance.get(path, options, others);
 	return res.data;
 };
 export const coinNAPost = async (path, options = {}, others = {}) => {

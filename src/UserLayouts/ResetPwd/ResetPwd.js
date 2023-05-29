@@ -1,12 +1,10 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import className from 'classnames/bind';
 import { Form } from '../../components';
 import styles from './ResetPwd.module.css';
-import { axiosUtils, useAppContext } from '../../utils';
-import routers from '../../routers/routers';
-import { actions } from '../../app/';
-import { ForgotPasswordOTP } from '../../services/authen';
+import { useAppContext } from '../../utils';
 
 const cx = className.bind(styles);
 
@@ -32,17 +30,7 @@ export default function ResetPwd() {
 	useEffect(() => {
 		document.title = `Reset Password | ${process.env.REACT_APP_TITLE_WEB}`;
 	}, []);
-	const handleReset = (e) => {
-		e.preventDefault();
-		setIsProcess(true);
-		ForgotPasswordOTP({
-			otpCode,
-			dispatch,
-			history,
-			setIsProcess,
-			setSnackbar,
-		});
-	};
+	const handleReset = (e) => {};
 	const onEnter = (e) => {
 		handleReset(e);
 	};

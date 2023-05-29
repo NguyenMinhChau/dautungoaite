@@ -1,18 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import className from 'classnames/bind';
 import { useParams, useNavigate } from 'react-router-dom';
-// import Alert from '@mui/material/Alert';
-import { getUsers } from '../../services/users';
-import {
-	searchBlacklistUsers,
-	getCoinById,
-	handleApplyBlacklist,
-	handleDeleteBlacklist,
-	handleCreate,
-	handleUpdate,
-} from '../../services/coins';
 import {
 	useAppContext,
 	DataBlacklistUsers,
@@ -69,7 +60,6 @@ function NewCoin() {
 	const refSymbolCoin = useRef();
 	const refFullName = useRef();
 	const refLogo = useRef();
-	const history = useNavigate();
 	useEffect(() => {
 		document.title = `${edit.itemData ? 'Update Coin' : 'Create Coin'} | ${
 			process.env.REACT_APP_TITLE_WEB
@@ -85,23 +75,9 @@ function NewCoin() {
 		});
 	};
 	const useDebounceUser = useDebounce(userBlacklist, 500);
-	useEffect(() => {
-		getUsers({
-			dispatch,
-			state,
-			page,
-			show,
-			search: userBlacklist,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceUser]);
-	useEffect(() => {
-		getCoinById({ idCoin, dispatch, state, setDataUserFake, setSnackbar });
-	}, [page, show]);
-	let searchDataFlag = searchBlacklistUsers({
-		userBlacklist,
-		dataUser: dataUser?.dataUser || dataUser?.data,
-	});
+	useEffect(() => {}, [page, show, useDebounceUser]);
+	useEffect(() => {}, [page, show]);
+	let searchDataFlag = []
 	// Modal + Input Form + File Upload
 	const toggleDeleteTrue = (e, id) => {
 		return deleteUtils.deleteTrue(e, id, dispatch, state, actions);
@@ -167,88 +143,13 @@ function NewCoin() {
 		}
 	};
 	// Set + Delete userBlackList
-	const handleApply = () => {
-		handleApplyBlacklist({
-			userBlacklist,
-			dispatch,
-			state,
-			dataUserFake,
-		});
-	};
-	const handleDeleteBlacklistUser = (id) => {
-		handleDeleteBlacklist({
-			dispatch,
-			state,
-			id,
-			setDataUserFake,
-			dataUserFake,
-			setSnackbar,
-		});
-	};
+	const handleApply = () => {};
+	const handleDeleteBlacklistUser = (id) => {};
 	// Add + Update Coin
-	const handleAddCoin = (data) => {
-		handleCreate({
-			data,
-			dispatch,
-			state,
-			nameCoin,
-			symbolCoin,
-			indexCoin,
-			fullName,
-			logo,
-			hideAllUser,
-			dataBlacklistUser,
-			history,
-			page,
-			show,
-			dataUser,
-			setSnackbar,
-			setIsProcess,
-		});
-	};
-	const addNewCoin = (e) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleAddCoin,
-			state,
-			dispatch,
-			actions,
-		);
-	};
-	const handleUpdateCoin = (data, id) => {
-		handleUpdate({
-			data,
-			dispatch,
-			state,
-			nameCoin,
-			symbolCoin,
-			indexCoin,
-			fullName,
-			logo,
-			hideAllUser,
-			dataBlacklistUser,
-			page,
-			show,
-			id,
-			search: settingCoin,
-			history,
-			dataUser,
-			setIsProcess,
-			setSnackbar,
-		});
-	};
-	const updateCoin = (e, id) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleUpdateCoin,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+
+	const addNewCoin = (e) => {};
+
+	const updateCoin = (e, id) => {};
 	function RenderBodyTable({ data }) {
 		return (
 			<>

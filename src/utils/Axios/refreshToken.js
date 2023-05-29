@@ -17,7 +17,7 @@ const requestRefreshToken = async (
 			const date = new Date();
 			if (decodedToken.exp < date.getTime() / 1000) {
 				const res = await axiosUtils.refreshToken(
-					`refreshToken/${currentUser?.id}`,
+					`token/refresh/${currentUser?.email}`,
 				);
 				const refreshUser = {
 					...currentUser,

@@ -19,6 +19,7 @@ export { default as Buy } from './Buy/Buy';
 export { default as Sell } from './Sell/Sell';
 export { default as BuySellDetail } from './BuySellDetail/BuySellDetail';
 export { default as User } from './User/User';
+export { default as Chat } from './Chat/Chat';
 export { default as UserDetail } from './UserDetail/UserDetail';
 export { default as NewCoin } from './NewCoin/NewCoin';
 export { default as NewCoinInactive } from './NewCoinInactive/NewCoinInactive';

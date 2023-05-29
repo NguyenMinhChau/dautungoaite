@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -7,7 +8,6 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Button, Icons, Image, SnackbarCp } from '../../components';
 import moment from 'moment';
-import { getDepositsWithdrawById } from '../../services/deposits';
 import {
 	useAppContext,
 	textUtils,
@@ -39,13 +39,6 @@ function DepositsWithdrawDetail() {
 	};
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
-		getDepositsWithdrawById({
-			idDeposits,
-			idWithdraw,
-			dispatch,
-			state,
-			setSnackbar,
-		});
 	}, []);
 	function ItemRender({
 		title,

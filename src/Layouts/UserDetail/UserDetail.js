@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -16,17 +17,6 @@ import {
 } from '../../components';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import {
-	handleUpdateRankFeeUser,
-	getUserById,
-	changeCoinGifts,
-	searchCoinGift,
-	updateCoinGift,
-	changePasswordUser,
-	refreshPasswordUser,
-	blockUser,
-	unblockUser,
-} from '../../services/users';
 import {
 	useAppContext,
 	requestRefreshToken,
@@ -74,15 +64,9 @@ function UserDetail() {
 		message: '',
 	});
 	const x = edit?.itemData;
-	const getAllCoin = async () => {
-		const res = await axiosUtils.coinGet(
-			`/getAllCoin?page=${page}&show=${dataSettingCoin?.total || 10}`,
-		);
-		setDataCoin(res.data);
-	};
+
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
-		getUserById({ idUser, dispatch, state, setSnackbar });
 	}, []);
 	const handleCloseSnackbar = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -93,9 +77,7 @@ function UserDetail() {
 			open: false,
 		});
 	};
-	useEffect(() => {
-		getAllCoin();
-	}, [page, show]);
+	useEffect(() => {}, [page, show]);
 	const changeFee = (e) => {
 		setFeeValue(e.target.value);
 	};
@@ -106,9 +88,7 @@ function UserDetail() {
 			}),
 		);
 	};
-	const handleChangeCoin = (coin) => {
-		changeCoinGifts({ coin, selectStatus, dispatch, state });
-	};
+	const handleChangeCoin = (coin) => {};
 	const toggleListCoin = () => {
 		dispatch(
 			actions.toggleModal({
@@ -152,142 +132,18 @@ function UserDetail() {
 		setIsModalImage(false);
 		setIndexImage(0);
 	};
-	const handleUpdateFee = (data, id) => {
-		handleUpdateRankFeeUser({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			fee: parseFloat(feeValue),
-			setIsProcessFee,
-			setFeeValue,
-		});
-	};
-	const updateFee = (id) => {
-		setIsProcessFee(true);
-		requestRefreshToken(
-			currentUser,
-			handleUpdateFee,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleUpdateCoin = (data, id) => {
-		updateCoinGift({
-			token: data?.token,
-			id,
-			changeCoin,
-			quantityCoin,
-			date: new Date(),
-			createBy: currentUser?.email,
-			dispatch,
-			state,
-			setIsProcessCoin,
-			setSnackbar,
-		});
-	};
-	const updateCoin = (id) => {
-		setIsProcessCoin(true);
-		requestRefreshToken(
-			currentUser,
-			handleUpdateCoin,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleChangePwd = (data, id) => {
-		changePasswordUser({
-			data,
-			id,
-			dispatch,
-			state,
-			password,
-			setSnackbar,
-			setIsProcessChangePwd,
-		});
-	};
-	const changePwd = (id) => {
-		setIsProcessChangePwd(true);
-		requestRefreshToken(
-			currentUser,
-			handleChangePwd,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleRefreshPwd = (data, id) => {
-		refreshPasswordUser({
-			data,
-			id,
-			dispatch,
-			state,
-			setIsProcessRefreshPwd,
-			setSnackbar,
-		});
-	};
-	const refreshPwd = async (id) => {
-		setIsProcessRefreshPwd(true);
-		requestRefreshToken(
-			currentUser,
-			handleRefreshPwd,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleBlockUser = (data, id) => {
-		blockUser({
-			token: data?.token,
-			id,
-			dispatch,
-			state,
-			blockUser: true,
-			setIsProcessBlockUser,
-			setSnackbar,
-		});
-	};
-	const onBlockUser = (id) => {
-		setIsProcessBlockUser(true);
-		requestRefreshToken(
-			currentUser,
-			handleBlockUser,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleUnBlockUser = (data, id) => {
-		unblockUser({
-			token: data?.token,
-			id,
-			dispatch,
-			state,
-			blockUser: false,
-			setIsProcessBlockUser,
-			setSnackbar,
-		});
-	};
-	const onUnblockUser = (id) => {
-		setIsProcessBlockUser(true);
-		requestRefreshToken(
-			currentUser,
-			handleUnBlockUser,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+
+	const updateFee = (id) => {};
+
+	const updateCoin = (id) => {};
+
+	const changePwd = (id) => {};
+
+	const refreshPwd = async (id) => {};
+
+	const onBlockUser = (id) => {};
+
+	const onUnblockUser = (id) => {};
 	const DATA_COINS =
 		dataCoin?.map((coin) => {
 			return {
@@ -298,10 +154,7 @@ function UserDetail() {
 	const uniqueDataCoins = DATA_COINS.filter(
 		(v, i, a) => a.findIndex((t) => t.name === v.name) === i,
 	);
-	let DataCoinFlag = searchCoinGift({
-		coin,
-		dataCoins: uniqueDataCoins,
-	});
+	let DataCoinFlag = [];
 	const URL_SERVER =
 		process.env.REACT_APP_TYPE === 'development'
 			? process.env.REACT_APP_URL_SERVER

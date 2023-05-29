@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
@@ -28,8 +29,6 @@ import {
 } from '../../utils';
 import { Link } from 'react-router-dom';
 import routers from '../../routers/routers';
-import { getCoinsUserBuy } from '../../services/coins';
-import { SVtotal } from '../../services/dashboard';
 import { FirstUpc } from '../../utils/format/LetterFirstUpc';
 import periodDate from '../../utils/FakeData/PeriodDate';
 
@@ -72,16 +71,6 @@ function Dashboard() {
 	};
 	useEffect(() => {
 		document.title = `Dashboard | ${process.env.REACT_APP_TITLE_WEB}`;
-		SVtotal({
-			state,
-			dispatch,
-			actions,
-			page,
-			show,
-			search: userBalance,
-			setIsLoad,
-			setIsProcess,
-		});
 	}, []);
 	const useDebounceDashboard = useDebounce(dashboard, 500);
 	const useDebounceUserBalance = useDebounce(userBalance, 500);
@@ -96,25 +85,12 @@ function Dashboard() {
 			}, 500);
 		}
 	}, [useDebounceDashboard, useDebounceUserBalance]);
-	useEffect(() => {
-		getCoinsUserBuy({
-			page,
-			show: dashboard ? dataDashboard?.data?.total : show,
-			dispatch,
-			state,
-			actions,
-		});
-		SVtotal({
-			state,
-			dispatch,
-			page,
-			show,
-			search: useDebounceUserBalance,
-			setIsLoad,
-			setIsProcess,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceDashboard, useDebounceUserBalance]);
+	useEffect(() => {}, [
+		page,
+		show,
+		useDebounceDashboard,
+		useDebounceUserBalance,
+	]);
 	let data = dataDashboard?.data?.coins || [];
 	if (dashboard) {
 		data = data.filter((item) => {
@@ -221,21 +197,7 @@ function Dashboard() {
 	const changeSearch = (e) => {
 		return searchUtils.logicSearch(e, dispatch, state, actions);
 	};
-	const handleSend = async () => {
-		setIsProcess(true);
-		setIsLoad(true);
-		SVtotal({
-			state,
-			dispatch,
-			fromDate: dateFrom || new Date().toISOString(),
-			toDate: dateTo || new Date().toISOString(),
-			page,
-			show,
-			search: useDebounceUserBalance ? useDebounceUserBalance : '',
-			setIsLoad,
-			setIsProcess,
-		});
-	};
+	const handleSend = async () => {};
 	const onSelectDate = (e) => {
 		e.stopPropagation();
 		setIsModalDate(false);

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import className from 'classnames/bind';
 import { Link, useNavigate } from 'react-router-dom';
@@ -32,15 +33,13 @@ function Login() {
 		});
 	};
 	const handleLogin = (e) => {
-		e.preventDefault();
 		setIsProcess(true);
 		LoginSV({
 			email,
 			password,
 			setIsProcess,
-			setSnackbar,
-			dispatch,
 			history,
+			dispatch,
 		});
 	};
 	const onEnter = (e) => {

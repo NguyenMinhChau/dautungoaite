@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -40,13 +41,8 @@ function AccountMenu({ className }) {
 			open: false,
 		});
 	};
-	const getUser = async () => {
-		const res = await axiosUtils.adminGet(`user/${currentUser?.id}`);
-		setUser(res.metadata);
-	};
-	React.useEffect(() => {
-		getUser();
-	}, []);
+
+	React.useEffect(() => {}, []);
 	const open = Boolean(accountMenu);
 	const history = useNavigate();
 	const handleClickMenu = (e) => {
@@ -67,10 +63,9 @@ function AccountMenu({ className }) {
 	};
 	const handleLogout = () => {
 		LogoutSV({
-			id: currentUser?.id,
-			dispatch,
+			email: currentUser?.email,
 			history,
-			setSnackbar,
+			dispatch,
 		});
 	};
 	const classed = cx('accountMenu-container', className);
@@ -95,7 +90,7 @@ function AccountMenu({ className }) {
 					>
 						<Avatar
 							sx={{ width: 30, height: 30 }}
-							src={currentUser.avatar || avatarPlaceholder}
+							src={currentUser?.avatar || avatarPlaceholder}
 						></Avatar>
 					</IconButton>
 				</Tooltip>
@@ -136,14 +131,14 @@ function AccountMenu({ className }) {
 				anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
 			>
 				<MenuItem>
-					<Avatar src={currentUser.avatar || avatarPlaceholder} />{' '}
-					{currentUser.username}
+					<Avatar src={currentUser?.avatar || avatarPlaceholder} />{' '}
+					{currentUser?.email || '---'}
 				</MenuItem>
 				<Divider />
-				<MenuItem>
+				{/* <MenuItem>
 					Your Wallet:{' '}
 					{numberUtils.coinUSD(user?.Wallet?.balance || 0)}
-				</MenuItem>
+				</MenuItem> */}
 				<MenuItem>
 					<ListItemIcon>
 						<Settings fontSize="small" />

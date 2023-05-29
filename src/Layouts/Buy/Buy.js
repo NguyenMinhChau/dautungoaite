@@ -1,13 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import 'react-loading-skeleton/dist/skeleton.css';
 import className from 'classnames/bind';
-import {
-	getBuys,
-	handleUpdateStatusFeeBuy,
-	handleDelete,
-} from '../../services/buy';
 import {
 	useAppContext,
 	DataBuys,
@@ -74,16 +70,7 @@ function Buy() {
 			}, 500);
 		}
 	}, [useDebounceBuy]);
-	useEffect(() => {
-		getBuys({
-			page,
-			show,
-			dispatch,
-			state,
-			search: useDebounceBuy,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceBuy]);
+	useEffect(() => {}, [page, show, useDebounceBuy]);
 	let dataBuyFlag = dataBuy?.data?.buys || dataBuy?.data;
 	const toggleEditStatusTrue = async (e, status, id) => {
 		await localStoreUtils.setStore({
@@ -103,73 +90,8 @@ function Buy() {
 	};
 
 	// EDIT + DELETE
-	const handleEdit = (data, id) => {
-		handleUpdateStatusFeeBuy({
-			data,
-			id,
-			dispatch,
-			note: `web_${currentUser?.email}`,
-			state,
-			statusUpdate,
-			statusCurrent,
-			page,
-			show,
-			search: buy,
-			setSnackbar,
-			setIsProcess,
-		});
-	};
-	const editStatusBuy = async (id) => {
-		await 1;
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleEdit,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-		dispatch(
-			actions.toggleModal({
-				modalStatus: false,
-			}),
-		);
-		dispatch(
-			actions.setData({
-				statusUpdate: '',
-				statusCurrent: '',
-			}),
-		);
-	};
-	const handleDeleteBuy = (data, id) => {
-		handleDelete({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			search: buy,
-			setSnackbar,
-		});
-	};
-	const deleteBuy = async (id) => {
-		await 1;
-		requestRefreshToken(
-			currentUser,
-			handleDeleteBuy,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-		dispatch(
-			actions.toggleModal({
-				modalDelete: false,
-			}),
-		);
-	};
+	const editStatusBuy = async (id) => {};
+	const deleteBuy = async (id) => {};
 	const handleViewBuy = (item) => {
 		dispatch(
 			actions.setData({

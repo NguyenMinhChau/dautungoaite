@@ -1,13 +1,12 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import className from 'classnames/bind';
 import { Modal, FormInput, ActionsTable } from '../../components';
-import { actions } from '../../app/';
 import { General } from '..';
 import moment from 'moment';
-import { getRates, SVupdateRate } from '../../services/rate';
 import {
 	DataRates,
 	useAppContext,
@@ -53,9 +52,7 @@ function Rate() {
 			open: false,
 		});
 	};
-	useEffect(() => {
-		getRates({ dispatch, state, setSnackbar });
-	}, [page, show]);
+	useEffect(() => {}, [page, show]);
 	const modalRateTrue = (e, item) => {
 		e.stopPropagation();
 		setModalRate(true);
@@ -72,32 +69,8 @@ function Rate() {
 		const { name, value } = e.target;
 		setRateUpdate({ ...rateUpdate, [name]: value });
 	};
-	const handleUpdateRate = (data, id) => {
-		SVupdateRate({
-			data,
-			idRate: id,
-			token: data?.token,
-			rateDeposit: rateUpdate.rateDeposit,
-			rateWithdraw: rateUpdate.rateWithdraw,
-			state,
-			dispatch,
-			setSnackbar,
-			setIsProcess,
-			setModalRate,
-			setRateUpdate,
-		});
-	};
-	const updateRate = (id) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleUpdateRate,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+
+	const updateRate = (id) => {};
 	function RenderBodyTable({ data }) {
 		return (
 			<>

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
@@ -5,11 +6,6 @@ import moment from 'moment';
 import routers from '../../routers/routers';
 import { actions } from '../../app/';
 import { General } from '../';
-import {
-	onClickEdit,
-	getCoinsInactive,
-	handleDeleteInactive,
-} from '../../services/coins';
 import {
 	useAppContext,
 	DataCoins,
@@ -63,16 +59,7 @@ function CoinInactive() {
 			}, 500);
 		}
 	}, [useDebounceCoin]);
-	useEffect(() => {
-		getCoinsInactive({
-			dispatch,
-			state,
-			page,
-			show,
-			search: useDebounceCoin,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceCoin]);
+	useEffect(() => {}, [page, show, useDebounceCoin]);
 	const dataSettingFlag =
 		dataCoinInactive?.data?.coins || dataCoinInactive?.data;
 	// Modal Delete
@@ -83,32 +70,9 @@ function CoinInactive() {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
 	// Edit + Delete Coin
-	const handleDeleteCoins = (data, id) => {
-		handleDeleteInactive({
-			data,
-			id,
-			dispatch,
-			state,
-			actions,
-			page,
-			show,
-			search: settingCoin,
-			setSnackbar,
-		});
-	};
-	const deleteCoins = (id) => {
-		requestRefreshToken(
-			currentUser,
-			handleDeleteCoins,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const editSetting = async (item) => {
-		onClickEdit({ dispatch, state, item });
-	};
+
+	const deleteCoins = (id) => {};
+	const editSetting = async (item) => {};
 	const URL_SERVER =
 		process.env.REACT_APP_TYPE === 'development'
 			? process.env.REACT_APP_URL_SERVER

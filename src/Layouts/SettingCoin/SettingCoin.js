@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
@@ -6,12 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import routers from '../../routers/routers';
 import { actions } from '../../app/';
 import { General } from '../';
-import {
-	getCoins,
-	onClickEdit,
-	handleDelete,
-	handleCreateCoinInactive,
-} from '../../services/coins';
 import {
 	useAppContext,
 	DataCoins,
@@ -66,16 +61,7 @@ function SettingCoin() {
 			}, 500);
 		}
 	}, [useDebounceCoin]);
-	useEffect(() => {
-		getCoins({
-			dispatch,
-			state,
-			page,
-			show,
-			search: useDebounceCoin,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceCoin]);
+	useEffect(() => {}, [page, show, useDebounceCoin]);
 	const dataSettingFlag =
 		dataSettingCoin?.data?.coins || dataSettingCoin?.data;
 	// Modal Delete
@@ -86,47 +72,10 @@ function SettingCoin() {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
 	// Edit + Delete Coin
-	const handleDeleteCoins = (data, id) => {
-		handleDelete({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			search: settingCoin,
-			setSnackbar,
-		});
-	};
-	const deleteCoins = (id) => {
-		requestRefreshToken(
-			currentUser,
-			handleDeleteCoins,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const editSetting = (item) => {
-		onClickEdit({ dispatch, state, item });
-	};
-	const handleBlock = (data, item) => {
-		handleCreateCoinInactive({
-			data,
-			dispatch,
-			state,
-			actions,
-			nameCoin: item?.name,
-			symbolCoin: item?.symbol,
-			fullName: item?.fullName,
-			logo_sub: item?.logo,
-			history,
-			page,
-			show,
-			setSnackbar,
-		});
-	};
+
+	const deleteCoins = (id) => {};
+	const editSetting = (item) => {};
+
 	const onClickBlock = async (item) => {
 		const check = dataCoinInactive?.data?.find(
 			(itemCoin) => itemCoin.symbol === item.symbol,
@@ -138,14 +87,7 @@ function SettingCoin() {
 				message: 'This coin is already blocked',
 			});
 		} else {
-			requestRefreshToken(
-				currentUser,
-				handleBlock,
-				state,
-				dispatch,
-				actions,
-				item,
-			);
+			// hieu
 		}
 	};
 	const URL_SERVER =

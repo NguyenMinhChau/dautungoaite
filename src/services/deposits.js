@@ -1,237 +1,113 @@
 /* eslint-disable no-unused-vars */
 import { actions } from '../app/';
-import routers from '../routers/routers';
 import {
-	axiosUtils,
-	searchUtils,
-	dispatchEdit,
-	dispatchDelete,
-	validates,
-} from '../utils';
+	userDelete,
+	userGet,
+	userPost,
+	userPut,
+} from '../utils/Axios/axiosInstance';
 
-// GET DATA DEPOSITS
-export const getDeposits = async (props = {}) => {
-	const { page, show, dispatch, state, search, setSnackbar } = props;
+export const getByIdDepositsSV = async (props = {}) => {
+	const { idDeposits, token, dispatch } = props;
 	try {
-		const processDeposits = await axiosUtils.adminGet(
-			`deposit/paging?page=${page}&show=${show}&search=${search}`,
-		);
-		const processUser = await axiosUtils.adminGet('user');
+		const resGet = await userGet(`deposit/${idDeposits}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
 		dispatch(
 			actions.setData({
-				data: {
-					...state.set.data,
-					dataDeposits: processDeposits,
-					dataUser: processUser,
+				edit: {
+					itemData: resGet?.metadata,
 				},
 			}),
 		);
 	} catch (err) {
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
+		alert(err?.response?.data?.message || 'Get data failed!');
 	}
 };
-// GET DEPOSITS/WITHDRAWS BY ID
-export const getDepositsWithdrawById = async (props = {}) => {
-	const { idDeposits, idWithdraw, dispatch, state, setSnackbar } = props;
+export const getByIdUserDepositsSV = async (props = {}) => {
+	const { idUser, token, dispatch } = props;
 	try {
-		if (idDeposits || idWithdraw) {
-			const processUser = await axiosUtils.adminGet('user');
-			const process = await axiosUtils.adminGet(
-				idDeposits ? `deposit/${idDeposits}` : `withdraw/${idWithdraw}`,
-			);
-			const { data } = process;
-			dispatch(
-				actions.setData({
-					edit: {
-						...state.set.edit,
-						itemData: data,
-					},
-					data: {
-						...state.set.data,
-						dataUser: processUser,
-					},
-				}),
-			);
-		}
+		const resGet = await userGet(`deposit/${idUser}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				edit: {
+					itemData: resGet?.metadata,
+				},
+			}),
+		);
 	} catch (err) {
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
+		alert(err?.response?.data?.message || 'Get data failed!');
 	}
 };
-// SEARCH DEPOSITS
-export const searchDeposits = (props = {}) => {
-	const { dataDeposits, deposits } = props;
-	let dataDepositsFlag = dataDeposits; //.dataDeposit
-	if (deposits) {
-		dataDepositsFlag = dataDepositsFlag.filter((item) => {
-			return (
-				searchUtils.searchInput(deposits, item._id) ||
-				searchUtils.searchInput(deposits, item.code) ||
-				searchUtils.searchInput(deposits, item.user) ||
-				searchUtils.searchInput(deposits, item?.amountVnd) ||
-				searchUtils.searchInput(deposits, item?.amount) ||
-				searchUtils.searchInput(deposits, item?.createBy) ||
-				searchUtils.searchInput(deposits, item.status)
-			);
-		});
-	}
-	return dataDepositsFlag;
-};
-// HANDLE EDIT DEPOSITS
-export const handleEdit = async (props = {}) => {
+export const addDepositsSV = async (props = {}) => {
 	const {
-		data,
-		note,
-		id,
-		dispatch,
-		state,
-		statusCurrent,
-		statusUpdate,
-		page,
-		show,
-		search,
-		setSnackbar,
-		setIsProcess,
-	} = props;
-	try {
-		const resPut = await axiosUtils.adminPut(`handle/deposit/${id}`, {
-			status: statusUpdate || statusCurrent,
-			note: note,
-			token: data?.token,
-		});
-		setIsProcess(false);
-		const res = await axiosUtils.adminGet(
-			`/getAllDeposit?page=${page}&show=${show}&search=${search}`,
-		);
-		dispatchEdit(
-			dispatch,
-			state,
-			setSnackbar,
-			actions,
-			res,
-			'dataDeposits',
-			resPut.message,
-		);
-		return data;
-	} catch (err) {
-		setIsProcess(false);
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
-	}
-};
-// HANDLE DELETE DEPOSITS
-export const handleDelete = async (props = {}) => {
-	const { data, id, dispatch, state, page, show, search, setSnackbar } =
-		props;
-	try {
-		const resDel = await axiosUtils.adminDelete(`deposit/${id}`, {
-			headers: {
-				token: data?.token,
-			},
-		});
-		const res = await axiosUtils.adminGet(
-			`deposit/paging?page=${page}&show=${show}&search=${search}`,
-		);
-		dispatchDelete(
-			dispatch,
-			state,
-			setSnackbar,
-			actions,
-			res,
-			'dataDeposits',
-			resDel.message,
-		);
-	} catch (err) {
-		setSnackbar({
-			open: true,
-			message: err?.response?.data?.message || 'Something error!',
-			type: 'error',
-		});
-	}
-};
-// HANDLE CREATE DEPOSIT
-export const handleCreate = async (props = {}) => {
-	const {
-		amount,
-		email,
-		amountVnd,
+		idUser,
 		token,
-		bankAdmin,
-		rateDeposit,
+		quantity,
+		pathImage,
 		setIsProcess,
-		setData,
-		setSnackbar,
+		setModalCreateDeposits,
+	} = props;
+	try {
+		const resPost = await userPost(
+			`deposit/${idUser}`,
+			{
+				quantity,
+				pathImage,
+			},
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		setIsProcess(false);
+		setModalCreateDeposits(false);
+		alert(resPost?.message || 'Add data successfully!');
+	} catch (err) {
+		setIsProcess(false);
+		alert(err?.response?.data?.message || 'Add data failed!');
+	}
+};
+export const deleteDepositsSV = async (props = {}) => {
+	const { idDeposits, token, setIsProcess, dispatch } = props;
+	try {
+		const resDel = await userDelete(
+			`deposit/${idDeposits}`,
+			{},
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		setIsProcess(false);
+		dispatch(
+			actions.toggleModal({
+				modalDelete: false,
+			}),
+		);
+		alert(resDel?.message || 'Delete data successfully!');
+	} catch (err) {
+		setIsProcess(false);
+		alert(err?.response?.data?.message || 'Delete data failed!');
+	}
+};
+export const updateDepositsSV = async (props = {}) => {
+	const {
+		idDeposits,
+		idUser,
+		token,
+		body,
+		setIsProcess,
+		setModalCreateDeposits,
 		dispatch,
 	} = props;
 	try {
-		const resPost = await axiosUtils.userPost('/deposit', {
-			amount: amount,
-			user: email,
-			amountVnd: amountVnd,
-			bankAdmin: bankAdmin,
-			rateDeposit: rateDeposit,
-			token: token,
-		});
-		setIsProcess(false);
-		const resGet = await axiosUtils.userGet(`/getAllDeposits/${email}`);
-		setData(resGet.data);
-		setSnackbar({
-			open: true,
-			message: resPost?.message
-				? resPost?.message
-				: 'Create deposit successfully',
-			type: 'success',
-		});
-		dispatch(
-			actions.toggleModal({
-				selectBank: false,
-			}),
+		const resPut = await userPut(
+			`deposit/${idUser}`,
+			{ body },
+			{ headers: { Authorization: `Bearer ${token}` } },
 		);
+		setIsProcess(false);
+		setModalCreateDeposits(false);
+		alert(resPut?.message || 'Update data successfully!');
 	} catch (err) {
 		setIsProcess(false);
-		setSnackbar({
-			open: true,
-			message:
-				"You don't have a payment account yet, please create one before doing so. Profile → Profile Payment. Thank you!",
-			type: 'error',
-		});
-		dispatch(
-			actions.toggleModal({
-				selectBank: false,
-			}),
-		);
-	}
-};
-// HANDLE UPDATE BILL DEPOSIT USER
-export const handleUpdateBillDeposit = async (props = {}) => {
-	const { token, id, logo, setIsProcess, history, setSnackbar } = props;
-	try {
-		const resPut = await axiosUtils.userPut(
-			`/updateImageDeposit/${id}`,
-			{
-				statement: logo[0],
-			},
-			{
-				headers: {
-					'Content-Type': 'multipart/form-data',
-					token: token,
-				},
-			},
-		);
-		setIsProcess(false);
-		alert(resPut?.message ? resPut?.message : 'Upload bill successfully');
-		history(routers.depositUser);
-	} catch (err) {
-		alert(err?.response?.data?.message || 'Upload bill failed');
+		alert(err?.response?.data?.message || 'Update data failed!');
 	}
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-lone-blocks */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -18,12 +19,6 @@ import { General } from '../';
 import { TrObjectNoIcon } from '../../components/TableData/TableData';
 import styles from './ChangeCoin.module.css';
 import Skeleton from 'react-loading-skeleton';
-import {
-	changeCoinGiftsSUB,
-	deleteChangeCoin,
-	getChangeCoin,
-} from '../../services/changeCoin';
-import { changeCoinGifts, searchCoinGift } from '../../services/users';
 import { FirstUpc } from '../../utils/format/LetterFirstUpc';
 
 const cx = className.bind(styles);
@@ -72,17 +67,7 @@ function ChangeCoin() {
 			}, 500);
 		}
 	}, [useDebounceCoin]);
-	useEffect(() => {
-		getChangeCoin({
-			page,
-			show,
-			dispatch,
-			state,
-			search: useDebounceCoin || '',
-			dataSettingCoin,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceCoin]);
+	useEffect(() => {}, [page, show, useDebounceCoin]);
 	let dataCoinFlag =
 		dataChangeCoins?.data?.bills ||
 		dataChangeCoins?.data?.billSearch ||
@@ -134,7 +119,6 @@ function ChangeCoin() {
 	};
 	const handleChangeCoinModal = (e, coin) => {
 		e.stopPropagation();
-		changeCoinGifts({ coin, selectStatus, dispatch, state });
 	};
 	const changeQuantity = (e) => {
 		dispatch(
@@ -144,57 +128,10 @@ function ChangeCoin() {
 		);
 	};
 	// Edit + Delete Deposits
-	const changeCoinAPI = (data) => {
-		changeCoinGiftsSUB({
-			data,
-			email: email,
-			coin: changeCoin,
-			quantityCoin: parseFloat(quantityCoin),
-			createBy: `web_${currentUser?.email}`,
-			time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-			dispatch,
-			state,
-			page,
-			show,
-			search: changeCoinSearch || '',
-			setIsProcess,
-			setSnackbar,
-		});
-	};
-	const handleChangeCoin = (email) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			changeCoinAPI,
-			state,
-			dispatch,
-			actions,
-			email,
-		);
-	};
-	const deleteAPI = (data) => {
-		deleteChangeCoin({
-			data,
-			state,
-			dispatch,
-			id,
-			page,
-			show,
-			search: changeCoinSearch || '',
-			setSnackbar,
-		});
-	};
-	const handleDel = (id) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			deleteAPI,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+
+	const handleChangeCoin = (email) => {};
+
+	const handleDel = (id) => {};
 	function RenderBodyTable({ data }) {
 		return (
 			<>
@@ -271,10 +208,7 @@ function ChangeCoin() {
 	const uniqueDataCoins = DATA_COINS.filter(
 		(v, i, a) => a.findIndex((t) => t.name === v.name) === i,
 	);
-	let DataCoinModalFlag = searchCoinGift({
-		coin,
-		dataCoins: uniqueDataCoins,
-	});
+	let DataCoinModalFlag = [];
 	return (
 		<>
 			<General

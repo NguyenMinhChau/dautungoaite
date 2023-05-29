@@ -1,13 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import className from 'classnames/bind';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-	getCoinById,
-	handleCreateCoinInactive,
-	handleUpdateInactive,
-} from '../../services/coins';
 import {
 	useAppContext,
 	formUtils,
@@ -49,7 +45,6 @@ function NewCoinInactive() {
 	const refSymbolCoin = useRef();
 	const refFullName = useRef();
 	const refLogo = useRef();
-	const history = useNavigate();
 	useEffect(() => {
 		document.title = `${
 			edit.itemData ? 'Update Coin Inactive' : 'Create Coin Inactive'
@@ -64,9 +59,7 @@ function NewCoinInactive() {
 			open: false,
 		});
 	};
-	useEffect(() => {
-		getCoinById({ idCoin, dispatch, state, actions, setSnackbar });
-	}, []);
+	useEffect(() => {}, []);
 	// Modal + Input Form + File Upload
 	const handleChange = (files) => {
 		return fileUploadUtils.handleChange(files, dispatch, state, actions);
@@ -105,63 +98,10 @@ function NewCoinInactive() {
 		return formUtils.changeForm(e, dispatch, state, actions);
 	};
 	// Add + Update Coin
-	const handleAddCoinInactive = (data) => {
-		handleCreateCoinInactive({
-			data,
-			dispatch,
-			state,
-			nameCoin,
-			symbolCoin,
-			fullName,
-			logo,
-			history,
-			page,
-			show,
-			setIsProcess,
-			setSnackbar,
-		});
-	};
-	const addNewCoinInactive = (e) => {
-		e.preventDefault();
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleAddCoinInactive,
-			state,
-			dispatch,
-			actions,
-		);
-	};
-	const handleUpdateCoinInactive = (data, id) => {
-		handleUpdateInactive({
-			data,
-			dispatch,
-			state,
-			nameCoin,
-			symbolCoin,
-			fullName,
-			logo,
-			page,
-			show,
-			id,
-			search: settingCoin,
-			history,
-			setIsProcess,
-			setSnackbar,
-		});
-	};
-	const updateCoinInactive = async (e, id) => {
-		e.preventDefault();
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleUpdateCoinInactive,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+
+	const addNewCoinInactive = (e) => {};
+
+	const updateCoinInactive = async (e, id) => {};
 	return (
 		<>
 			<div className={`${cx('newcoin-container')}`}>

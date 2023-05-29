@@ -1,10 +1,10 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import className from 'classnames/bind';
 import { Form } from '../../components';
 import { useAppContext } from '../../utils';
 import styles from './ForgotPwd.module.css';
-import { ForgotPasswordSV } from '../../services/authen';
 
 const cx = className.bind(styles);
 
@@ -32,14 +32,6 @@ function ForgotPwd() {
 	};
 	const handleForgot = (e) => {
 		e.preventDefault();
-		setIsProcess(true);
-		ForgotPasswordSV({
-			email,
-			setIsProcess,
-			setSnackbar,
-			dispatch,
-			history,
-		});
 	};
 	const onEnter = (e) => {
 		handleForgot(e);

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
@@ -16,15 +17,15 @@ import { TrStatus } from '../../components/TableData/TableData';
 import routers from '../../routers/routers';
 import { actions } from '../../app/';
 import { General } from '../';
-import { Modal, ActionsTable, SelectStatus } from '../../components';
-import {
-	getUsers,
-	handleDelete,
-	handleUpdateRankFeeUser,
-	handleUpdateRuleUser,
-} from '../../services/users';
+import { Modal, ActionsTable, SelectStatus, FormInput } from '../../components';
 import styles from './User.module.css';
 import moment from 'moment';
+import {
+	getAllAccountSV,
+	createAccountSV,
+	deleteAccountSV,
+	updateAccountSV,
+} from '../../services/users';
 
 const cx = className.bind(styles);
 const DATA_USERS = DataUsers();
@@ -44,13 +45,35 @@ function User() {
 	const { modalDelete, modalStatus } = state.toggle;
 	const [isProcess, setIsProcess] = useState(false);
 	const [modalChangeRule, setModalChangeRule] = useState(false);
+	const [modalCreateAccount, setModalCreateAccount] = useState(false);
+	const [isUpdateAccount, setIsUpdateAccount] = useState(false);
+	const [dataFormCreateAccount, setDataFormCreateAccount] = useState({
+		username: '',
+		password: '',
+		host: '',
+		port: '',
+	});
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		type: '',
 		message: '',
 	});
+	const getAllAccount = (dataToken) => {
+		getAllAccountSV({
+			token: dataToken?.token,
+			dispatch,
+			idUser: currentUser?.id,
+		});
+	};
 	useEffect(() => {
 		document.title = `User | ${process.env.REACT_APP_TITLE_WEB}`;
+		requestRefreshToken(
+			currentUser,
+			getAllAccount,
+			state,
+			dispatch,
+			actions,
+		);
 	}, []);
 	const handleCloseSnackbar = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -73,18 +96,9 @@ function User() {
 			}, 500);
 		}
 	}, [useDebounceUser]);
-	useEffect(() => {
-		getUsers({
-			page,
-			show,
-			dispatch,
-			state,
-			search: useDebounceUser,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceUser]);
+	useEffect(() => {}, [page, show, useDebounceUser]);
 	//Search Data Users
-	let dataUserFlag = dataUser?.dataUser || dataUser?.data;
+	let dataUserFlag = dataUser?.dataUser || [];
 	const toggleEditTrue = async (e, status, id) => {
 		await localStoreUtils.setStore({
 			...currentUser,
@@ -126,7 +140,17 @@ function User() {
 			}),
 		);
 	};
+	const openModalCreateAccount = (e) => {
+		e.stopPropagation();
+		setModalCreateAccount(true);
+	};
+	const closeModalCreateAccount = (e) => {
+		e.stopPropagation();
+		setModalCreateAccount(false);
+	};
 	const handleViewUser = (item) => {
+		// setIsUpdateAccount(true);
+		// setModalCreateAccount(true);
 		dispatch(
 			actions.setData({
 				edit: {
@@ -137,82 +161,80 @@ function User() {
 			}),
 		);
 	};
-	// Delete User + Update Status User
-	const handleDeleteUser = (data, id) => {
-		handleDelete({
-			data,
-			id,
+	const handleChangeCreateAccount = (e) => {
+		setDataFormCreateAccount({
+			...dataFormCreateAccount,
+			[e.target.name]: e.target.value,
+		});
+	};
+	const createAccount = (dataToken) => {
+		createAccountSV({
+			username: dataFormCreateAccount.username,
+			password: dataFormCreateAccount.password,
+			host: dataFormCreateAccount.host,
+			port: dataFormCreateAccount.port,
+			token: dataToken?.token,
 			dispatch,
+			idUser: currentUser?.id,
+			setIsProcess,
+			setModalCreateAccount,
+			setDataFormCreateAccount,
+		});
+	};
+	const handleCreateAccount = () => {
+		setIsProcess(true);
+		requestRefreshToken(
+			currentUser,
+			createAccount,
 			state,
-			page,
-			show,
-			search: user,
-			setSnackbar,
+			dispatch,
+			actions,
+		);
+	};
+	const updateAccount = (dataToken, id) => {
+		updateAccountSV({
+			token: dataToken?.token,
+			idAccount: id,
+			setIsProcess,
+			body: { dataFormCreateAccount },
+			setModalCreateAccount,
+			setDataFormCreateAccount,
+			setIsUpdateAccount,
+		});
+	};
+	const handleUpdateAccount = (id) => {
+		setIsProcess(true);
+		requestRefreshToken(
+			currentUser,
+			updateAccount,
+			state,
+			dispatch,
+			actions,
+			id,
+		);
+	};
+	// Delete User + Update Status User
+	const deleteAccount = (dataToken, id) => {
+		deleteAccountSV({
+			idAccount: id,
+			token: dataToken?.token,
+			setIsProcess,
+			dispatch,
 		});
 	};
 	const deleteUser = (id) => {
-		requestRefreshToken(
-			currentUser,
-			handleDeleteUser,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleEditRank = (data, id) => {
-		handleUpdateRankFeeUser({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			statusUpdate,
-			statusCurrent,
-			search: user,
-			setSnackbar,
-			setIsProcess,
-		});
-	};
-	const editStatus = (id) => {
 		setIsProcess(true);
 		requestRefreshToken(
 			currentUser,
-			handleEditRank,
+			deleteAccount,
 			state,
 			dispatch,
 			actions,
 			id,
 		);
 	};
-	const handleEditRuleUser = (data, id) => {
-		handleUpdateRuleUser({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			statusUpdate,
-			statusCurrent,
-			search: user,
-			setSnackbar,
-			setIsProcess,
-			setModalChangeRule,
-		});
-	};
-	const editRuleUser = async (id) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleEditRuleUser,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+	const editStatus = (id) => {};
+	const editRuleUser = async (id) => {};
 	function RenderBodyTable({ data }) {
 		return (
 			<>
@@ -288,6 +310,9 @@ function User() {
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
+				textBtnNew="Create Account"
+				classNameButton={'completebgc'}
+				onCreate={openModalCreateAccount}
 			>
 				<RenderBodyTable data={dataUserFlag} />
 			</General>
@@ -334,10 +359,53 @@ function User() {
 					classNameButton="cancelbgc"
 					onClick={() => deleteUser(edit.id)}
 					isProcess={isProcess}
+					disabled={isProcess}
 				>
 					<p className="modal-delete-desc">
 						Are you sure to delete this user?
 					</p>
+				</Modal>
+			)}
+			{modalCreateAccount && (
+				<Modal
+					titleHeader="Create Account"
+					actionButtonText={isUpdateAccount ? 'Update' : 'Send'}
+					openModal={openModalCreateAccount}
+					closeModal={closeModalCreateAccount}
+					isProcess={isProcess}
+					disabled={isProcess}
+					classNameButton={'confirmbgc'}
+					onClick={
+						isUpdateAccount
+							? () => handleUpdateAccount(edit?.id)
+							: handleCreateAccount
+					}
+				>
+					<FormInput
+						label="Username"
+						name="username"
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter username"
+					/>
+					<FormInput
+						label="Password"
+						name="password"
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter password"
+						showPwd
+					/>
+					<FormInput
+						label="Host"
+						name="host"
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter host"
+					/>
+					<FormInput
+						label="Port"
+						name="port"
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter port"
+					/>
 				</Modal>
 			)}
 		</>

@@ -107,17 +107,7 @@ export default function HomeUser() {
 			}, 500);
 		}
 	}, [useDebounceCoin]);
-	useEffect(() => {
-		getCoinsUser({
-			dispatch,
-			state,
-			page,
-			show,
-			search: useDebounceCoin,
-			id: currentUser?.id,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceCoin]);
+	useEffect(() => {}, [page, show, useDebounceCoin]);
 	let showPage = 10;
 	const start = (page - 1) * showPage + 1;
 	const end = start + showPage - 1;

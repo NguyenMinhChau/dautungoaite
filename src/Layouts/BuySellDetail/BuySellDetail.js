@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
@@ -5,7 +6,6 @@ import { useLocation, useParams } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import moment from 'moment';
 import { Button, Icons, SnackbarCp } from '../../components';
-import { getBuySellById } from '../../services/buy';
 import 'react-loading-skeleton/dist/skeleton.css';
 import {
 	useAppContext,
@@ -38,7 +38,6 @@ function BuySellDetail() {
 	};
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
-		getBuySellById({ idBuy, idSell, dispatch, state, setSnackbar });
 	}, []);
 	function ItemRender({ title, info, feeCustom }) {
 		return (

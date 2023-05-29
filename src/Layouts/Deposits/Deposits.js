@@ -1,8 +1,8 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
 import moment from 'moment';
-import { getDeposits, handleEdit, handleDelete } from '../../services/deposits';
 import {
 	useAppContext,
 	DataDeposits,
@@ -13,7 +13,13 @@ import {
 	numberUtils,
 	useDebounce,
 } from '../../utils';
-import { Icons, ActionsTable, Modal, SelectStatus } from '../../components';
+import {
+	Icons,
+	ActionsTable,
+	Modal,
+	SelectStatus,
+	FormInput,
+} from '../../components';
 import { actions } from '../../app/';
 import routers from '../../routers/routers';
 import { General } from '../';
@@ -24,6 +30,11 @@ import {
 } from '../../components/TableData/TableData';
 import styles from './Deposits.module.css';
 import Skeleton from 'react-loading-skeleton';
+import {
+	addDepositsSV,
+	deleteDepositsSV,
+	updateDepositsSV,
+} from '../../services/deposits';
 
 const cx = className.bind(styles);
 
@@ -40,6 +51,12 @@ function Deposits() {
 	} = state.set;
 	const { modalStatus, modalDelete } = state.toggle;
 	const [isProcess, setIsProcess] = useState(false);
+	const [modalCreateDeposits, setModalCreateDeposits] = useState(false);
+	const [isUpdate, setIsUpdate] = useState(false);
+	const [dataCreateDeposits, setDataCreateDeposits] = useState({
+		quantity: '',
+		pathImage: '',
+	});
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		type: '',
@@ -69,17 +86,8 @@ function Deposits() {
 			}, 500);
 		}
 	}, [useDebounceDeposit]);
-	useEffect(() => {
-		getDeposits({
-			page,
-			show,
-			dispatch,
-			state,
-			search: useDebounceDeposit,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceDeposit]);
-	let dataDepositsFlag = dataDeposits?.data?.deposits || dataDeposits?.data;
+	useEffect(() => {}, [page, show, useDebounceDeposit]);
+	let dataDepositsFlag = dataDeposits?.deposits || [];
 	// Modal
 	const toggleEditTrue = async (e, status, id) => {
 		await localStoreUtils.setStore({
@@ -97,56 +105,41 @@ function Deposits() {
 	const modalDeleteFalse = (e) => {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
+	const openModalCreateDeposits = (e) => {
+		e.stopPropagation();
+		setModalCreateDeposits(true);
+	};
+	const closeModalCreateDeposits = (e) => {
+		e.stopPropagation();
+		setModalCreateDeposits(false);
+	};
+	const handleChangeCreateDeposits = (e) => {
+		setDataCreateDeposits({
+			...dataCreateDeposits,
+			[e.target.name]: e.target.value,
+		});
+	};
 	// Edit + Delete Deposits
-	const handleDeleteDeposits = (data, id) => {
-		handleDelete({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			search: deposits,
-			setSnackbar,
-		});
-	};
-	const deleteDeposits = (id) => {
-		requestRefreshToken(
-			currentUser,
-			handleDeleteDeposits,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const handleEditStatus = (data, id) => {
-		handleEdit({
-			data,
-			note: `web_${currentUser?.email}`,
-			id,
-			dispatch,
-			state,
-			statusCurrent,
-			statusUpdate,
-			page,
-			show,
-			search: deposits,
-			setSnackbar,
+	const deleteDeposits = (dataToken, id) => {
+		deleteDepositsSV({
+			idDeposits: id,
+			token: dataToken?.token,
 			setIsProcess,
+			dispatch,
 		});
 	};
-	const editStatus = (id) => {
+	const handleDeleteDeposits = (id) => {
 		setIsProcess(true);
 		requestRefreshToken(
 			currentUser,
-			handleEditStatus,
+			deleteDeposits,
 			state,
 			dispatch,
 			actions,
 			id,
 		);
 	};
+	const editStatus = (id) => {};
 	const handleViewDeposits = (item) => {
 		dispatch(
 			actions.setData({
@@ -156,6 +149,48 @@ function Deposits() {
 					itemData: item,
 				},
 			}),
+		);
+	};
+	const createDeposits = (dataToken) => {
+		addDepositsSV({
+			idUser: currentUser?.id,
+			token: dataToken?.token,
+			quantity: dataCreateDeposits.quantity,
+			pathImage: dataCreateDeposits.pathImage,
+			setIsProcess,
+			setModalCreateDeposits,
+		});
+	};
+	const handleCreateDeposits = () => {
+		setIsProcess(true);
+		requestRefreshToken(
+			currentUser,
+			createDeposits,
+			state,
+			dispatch,
+			actions,
+		);
+	};
+	const updateDeposits = (dataToken, id) => {
+		updateDepositsSV({
+			idDeposits: id,
+			idUser: currentUser?.id,
+			token: dataToken?.token,
+			body: dataCreateDeposits,
+			setIsProcess,
+			setModalCreateDeposits,
+			dispatch,
+		});
+	};
+	const handleUpdateDeposits = (id) => {
+		setIsProcess(true);
+		requestRefreshToken(
+			currentUser,
+			updateDeposits,
+			state,
+			dispatch,
+			actions,
+			id,
 		);
 	};
 	function RenderBodyTable({ data }) {
@@ -244,6 +279,9 @@ function Deposits() {
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
+				textBtnNew="Create Deposits"
+				classNameButton="completebgc"
+				onCreate={openModalCreateDeposits}
 			>
 				<RenderBodyTable data={dataDepositsFlag} />
 			</General>
@@ -276,12 +314,41 @@ function Deposits() {
 					openModal={modalDeleteTrue}
 					closeModal={modalDeleteFalse}
 					classNameButton="cancelbgc"
-					onClick={() => deleteDeposits(edit.id)}
+					onClick={() => handleDeleteDeposits(edit.id)}
 					isProcess={isProcess}
 				>
 					<p className="modal-delete-desc">
 						Are you sure to delete this deposits?
 					</p>
+				</Modal>
+			)}
+			{modalCreateDeposits && (
+				<Modal
+					titleHeader="Create Deposits"
+					actionButtonText={isUpdate ? 'Update' : 'Send'}
+					classNameButton={'confirmbgc'}
+					openModal={openModalCreateDeposits}
+					closeModal={closeModalCreateDeposits}
+					isProcess={isProcess}
+					disabled={isProcess}
+					onClick={
+						isUpdate
+							? () => handleUpdateDeposits(edit?.id)
+							: handleCreateDeposits
+					}
+				>
+					<FormInput
+						label="Quantity"
+						placeholder="Enter quantity"
+						name="quantity"
+						onChange={handleChangeCreateDeposits}
+					/>
+					<FormInput
+						label="Path mage"
+						placeholder="Enter image"
+						name="pathImage"
+						onChange={handleChangeCreateDeposits}
+					/>
 				</Modal>
 			)}
 		</>

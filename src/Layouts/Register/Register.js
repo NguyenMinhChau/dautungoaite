@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import className from 'classnames/bind';
 import { useNavigate } from 'react-router-dom';
@@ -31,15 +32,12 @@ function Register() {
 		});
 	};
 	const handleRegister = (e) => {
-		e.preventDefault();
 		setIsProcess(true);
 		RegisterSV({
 			username,
 			email,
 			password,
 			setIsProcess,
-			setSnackbar,
-			dispatch,
 			history,
 		});
 	};

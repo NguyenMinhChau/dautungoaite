@@ -1,11 +1,7 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
-import {
-	getSells,
-	handleUpdateStatusFeeSell,
-	handleDelete,
-} from '../../services/sell';
 import {
 	useAppContext,
 	DataSells,
@@ -76,16 +72,7 @@ function Sell() {
 			}, 500);
 		}
 	}, [useDebounceSell]);
-	useEffect(() => {
-		getSells({
-			page,
-			show,
-			dispatch,
-			state,
-			search: useDebounceSell,
-			setSnackbar,
-		});
-	}, [page, show, useDebounceSell]);
+	useEffect(() => {}, [page, show, useDebounceSell]);
 	let dataSellFlag = dataSell?.data?.sells || dataSell?.data;
 	const toggleEditTrue = async (e, status, id) => {
 		await localStoreUtils.setStore({
@@ -105,73 +92,10 @@ function Sell() {
 	};
 
 	// EDIT + DELETE
-	const handleEdit = (data, id) => {
-		handleUpdateStatusFeeSell({
-			data,
-			id,
-			dispatch,
-			state,
-			note: `web_${currentUser?.email}`,
-			page,
-			show,
-			statusUpdate,
-			statusCurrent,
-			search: sell,
-			setSnackbar,
-			setIsProcess,
-		});
-	};
-	const editStatusSell = async (id) => {
-		await 1;
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleEdit,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-		dispatch(
-			actions.toggleModal({
-				modalStatus: false,
-			}),
-		);
-		dispatch(
-			actions.setData({
-				statusUpdate: '',
-				statusCurrent: '',
-			}),
-		);
-	};
-	const handleDeleteSell = (data, id) => {
-		handleDelete({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			search: sell,
-			setSnackbar,
-		});
-	};
-	const deleteSell = async (id) => {
-		await 1;
-		requestRefreshToken(
-			currentUser,
-			handleDeleteSell,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-		dispatch(
-			actions.toggleModal({
-				modalDelete: false,
-			}),
-		);
-	};
+
+	const editStatusSell = async (id) => {};
+
+	const deleteSell = async (id) => {};
 	const handleViewSell = (item) => {
 		dispatch(
 			actions.setData({

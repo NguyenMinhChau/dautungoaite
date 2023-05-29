@@ -28,18 +28,8 @@ export default function BuyCoinUser() {
 	const [amountBuy, setAmountBuy] = useState();
 	const [priceSocket, setPriceSocket] = useState(0);
 	const history = useNavigate();
-	const getCoinById = async () => {
-		const res = await axiosUtils.coinGet(`${idCoin}`);
-		setCoin(res.metadata);
-	};
-	const getUser = async () => {
-		const res = await axiosUtils.adminGet(`user/${currentUser?.id}`);
-		setUser(res.metadata);
-	};
-	useEffect(() => {
-		getCoinById();
-		getUser();
-	}, []);
+
+	useEffect(() => {}, []);
 	const URL_SERVER =
 		process.env.REACT_APP_TYPE === 'development'
 			? process.env.REACT_APP_URL_SERVER
@@ -59,28 +49,8 @@ export default function BuyCoinUser() {
 	const handleChange = useCallback((e) => {
 		setAmountBuy(e.target.value);
 	}, []);
-	const handleBuyAPI = (data) => {
-		handleBuyCoin({
-			idUser: currentUser?.id,
-			symbol: coin?.symbol,
-			amount: parseFloat(amountBuy),
-			price: parseFloat(priceSocket),
-			date: new Date(),
-			token: data?.token,
-			setIsProcess,
-			history,
-		});
-	};
-	const handleSubmit = useCallback(async () => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleBuyAPI,
-			state,
-			dispatch,
-			actions,
-		);
-	}, [
+
+	const handleSubmit = useCallback(async () => {}, [
 		coin?.symbol,
 		parseFloat(priceSocket),
 		amountBuy,

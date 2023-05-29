@@ -40,15 +40,8 @@ export default function MyCoinUser() {
 			}, 500);
 		}
 	}, [useDebounceCoin]);
-	const getMyCoin = async () => {
-		const res = await axiosUtils.userGet(
-			`coin/own/${currentUser?.id}?page=${page}&show=${show}&search=${useDebounceCoin}`,
-		);
-		setData(res.metadata);
-	};
-	useEffect(() => {
-		getMyCoin();
-	}, [page, show, useDebounceCoin]);
+
+	useEffect(() => {}, [page, show, useDebounceCoin]);
 	const dataSettingFlag = data || [];
 	const URL_SERVER =
 		process.env.REACT_APP_TYPE === 'development'
