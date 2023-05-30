@@ -24,7 +24,7 @@ function Chat() {
 		fileRejections,
 		form: { logo },
 	} = state.set;
-	const from = 'test@gmail.com';
+	const from = currentUser?.email;
 	const to = 'bot';
 	const [openEmoji, setOpenEmoji] = useState(false);
 	const [openScrollToBottom, setOpenScrollToBottom] = useState(false);
@@ -284,6 +284,12 @@ function Chat() {
 						<div
 							className={`${cx('send_icon')}`}
 							onClick={handleSendMessage}
+							// enter send message
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSendMessage();
+								}
+							}}
 						>
 							<i
 								className="bx bx-send"
