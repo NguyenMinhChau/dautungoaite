@@ -251,6 +251,12 @@ function Chat() {
 								value={chat}
 								onChange={handleChangeTextAreae}
 								ref={textareaRef}
+								// enter send message
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleSendMessage();
+									}
+								}}
 							></textarea>
 							<div className={`${cx('file_icon_container')}`}>
 								<div
@@ -284,12 +290,6 @@ function Chat() {
 						<div
 							className={`${cx('send_icon')}`}
 							onClick={handleSendMessage}
-							// enter send message
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									handleSendMessage();
-								}
-							}}
 						>
 							<i
 								className="bx bx-send"
