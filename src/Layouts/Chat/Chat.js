@@ -7,6 +7,8 @@ import styles from './Chat.module.css';
 import socketIO from 'socket.io-client';
 import { useAppContext } from '../../utils';
 import { actions } from '../../app/';
+import { TextareaAutosize } from '@mui/material';
+
 import moment from 'moment';
 
 const cx = className.bind(styles);
@@ -245,19 +247,43 @@ function Chat() {
 				<div className={`${cx('chat')}`}>
 					<div className={`${cx('chat_textarea')}`}>
 						<div className={`${cx('chat_textarea_relative')}`}>
-							<textarea
-								rows={1}
+							<TextareaAutosize
+								minRows={1}
+								maxRows={3}
+								placeholder="Write something..."
+								value={chat}
+								onChange={handleChangeTextAreae}
+								onKeyDown={(e) => {
+									if (
+										e.key === 'Enter' &&
+										!e.shiftKey &&
+										window.innerWidth > 768
+									) {
+										e.preventDefault();
+										handleSendMessage();
+									}
+								}}
+								name="chat"
+								ref={textareaRef}
+							/>
+							{/* <textarea
+								minRows={1}
+								maxRows={5}
 								placeholder="Write something..."
 								value={chat}
 								onChange={handleChangeTextAreae}
 								ref={textareaRef}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter' && !e.shiftKey) {
+									if (
+										e.key === 'Enter' &&
+										!e.shiftKey &&
+										window.innerWidth > 768
+									) {
 										e.preventDefault();
 										handleSendMessage();
 									}
 								}}
-							></textarea>
+							></textarea> */}
 							<div className={`${cx('file_icon_container')}`}>
 								<div
 									className={`${cx('file_icon_item')}`}
