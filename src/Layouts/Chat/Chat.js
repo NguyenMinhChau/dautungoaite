@@ -251,9 +251,9 @@ function Chat() {
 								value={chat}
 								onChange={handleChangeTextAreae}
 								ref={textareaRef}
-								// enter send message
 								onKeyDown={(e) => {
-									if (e.key === 'Enter') {
+									if (e.key === 'Enter' && !e.shiftKey) {
+										e.preventDefault();
 										handleSendMessage();
 									}
 								}}
