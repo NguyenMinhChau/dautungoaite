@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
@@ -5,9 +6,12 @@ import className from 'classnames/bind';
 import Picker from 'emoji-picker-react';
 import styles from './Chat.module.css';
 import socketIO from 'socket.io-client';
-import { useAppContext } from '../../utils';
+import { requestRefreshToken, useAppContext } from '../../utils';
 import { actions } from '../../app/';
+import { Button } from '../../components';
 import { TextareaAutosize } from '@mui/material';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { getAllChatByEmailSV } from '../../services/users';
 
 import moment from 'moment';
 
@@ -30,8 +34,10 @@ function Chat() {
 	const to = 'bot';
 	const [openEmoji, setOpenEmoji] = useState(false);
 	const [openScrollToBottom, setOpenScrollToBottom] = useState(false);
+	const [copied, setCopied] = useState(false);
 	const [chatFiles, setChatFiles] = useState([]);
 	const [dataMessage, setDataMessage] = useState([]);
+	const [idTextMessage, setIdTextMessage] = useState(null);
 	const textareaRef = useRef();
 	const contentChatRef = useRef();
 	const scrollToBottom = () => {
@@ -40,10 +46,19 @@ function Chat() {
 				contentChatRef.current.scrollHeight;
 		}
 	};
+	const getAllChat = (dataToken) => {
+		getAllChatByEmailSV({
+			emailUser: currentUser?.email,
+			setDataMessage,
+			token: dataToken?.token,
+		});
+	};
 	useEffect(() => {
 		socket.on('get_messages', (data) => {
 			setDataMessage(data);
+			// setDataMessage((prev) => [...prev, data]);
 		});
+		requestRefreshToken(currentUser, getAllChat, state, dispatch, actions);
 		const handleScrollTop = () => {
 			if (
 				contentChatRef.current.scrollTop +
@@ -97,6 +112,14 @@ function Chat() {
 				to: to,
 				message: chat,
 			});
+			// setDataMessage((prev) => [
+			// 	...prev,
+			// 	{
+			// 		createdAt: new Date(),
+			// 		email: currentUser?.email,
+			// 		text: chat,
+			// 	},
+			// ]);
 			dispatch(actions.setData({ chat: '' }));
 			setChatFiles([]);
 		}
@@ -112,10 +135,21 @@ function Chat() {
 			return [...prev.slice(0, index), ...prev.slice(index + 1)];
 		});
 	};
+	const handleOnCopy = () => {
+		alert('Copied');
+	};
 	const DATA_CHAT = dataMessage || [];
+	const handleClearChat = () => {
+		setDataMessage([]);
+	};
 	const idUser = 'NguyenMinhChau';
 	return (
 		<div className={`${cx('container_chat')}`}>
+			<div className={`${cx('list_btn_actions')} mb8`}>
+				<Button className={'cancelbgc'} onClick={handleClearChat}>
+					<i class="bx bx-trash mr4"></i> Clear Chat
+				</Button>
+			</div>
 			<div className={`${cx('frame_chat_container')}`}>
 				<div className={`${cx('chat_content')}`}>
 					<div className={`${cx('content')}`} ref={contentChatRef}>
@@ -131,8 +165,9 @@ function Chat() {
 											className={`${cx(
 												'content_item',
 												// item?.idUser === idUser
-												(index + 1) % 2 !== 0
-													? 'right_align'
+												(index + 1) % 2 === 0
+													? // !item?._id
+													  'right_align'
 													: 'left_align',
 											)}`}
 											key={index}
@@ -144,8 +179,9 @@ function Chat() {
 												className={`${cx(
 													'content_item_text_image_container',
 												)} ${
-													(index + 1) % 2 !== 0
-														? 'flex-end flex-row-reverse'
+													(index + 1) % 2 === 0
+														? // !item?._id
+														  'flex-end flex-row-reverse'
 														: 'flex-start'
 												}`}
 											>
@@ -155,8 +191,9 @@ function Chat() {
 													className={`${cx(
 														'content_item_image',
 													)} ${
-														(index + 1) % 2 !== 0
-															? 'ml8'
+														(index + 1) % 2 === 0
+															? // !item?._id
+															  'ml8'
 															: 'mr8'
 													}`}
 												/>
@@ -164,18 +201,45 @@ function Chat() {
 													className={`${cx(
 														'content_item_text',
 													)}`}
-												>
-													{item.text || '---'}
-												</div>
+													dangerouslySetInnerHTML={{
+														__html:
+															item.text || '---',
+													}}
+												></div>
 											</div>
 											<div
 												className={`${cx(
 													'content_item_time',
 												)}`}
 											>
-												{moment(
-													item?.createdAt,
-												).fromNow()}
+												<span>
+													{moment(
+														item?.createdAt,
+													).fromNow()}
+												</span>
+												<CopyToClipboard
+													text={item?.text}
+													onCopy={handleOnCopy}
+												>
+													<span
+														className={`${cx(
+															'icon_copy',
+														)} ml8`}
+													>
+														{copied &&
+														idTextMessage ===
+															item?._id ? (
+															<i
+																class="bx bx-check"
+																style={{
+																	color: '#4ccd61',
+																}}
+															></i>
+														) : (
+															<i class="bx bx-copy-alt"></i>
+														)}
+													</span>
+												</CopyToClipboard>
 											</div>
 										</div>
 									);
@@ -266,24 +330,6 @@ function Chat() {
 								name="chat"
 								ref={textareaRef}
 							/>
-							{/* <textarea
-								minRows={1}
-								maxRows={5}
-								placeholder="Write something..."
-								value={chat}
-								onChange={handleChangeTextAreae}
-								ref={textareaRef}
-								onKeyDown={(e) => {
-									if (
-										e.key === 'Enter' &&
-										!e.shiftKey &&
-										window.innerWidth > 768
-									) {
-										e.preventDefault();
-										handleSendMessage();
-									}
-								}}
-							></textarea> */}
 							<div className={`${cx('file_icon_container')}`}>
 								<div
 									className={`${cx('file_icon_item')}`}

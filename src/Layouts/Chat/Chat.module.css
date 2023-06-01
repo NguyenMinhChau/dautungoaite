@@ -59,8 +59,16 @@
 	filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.05));
 }
 .content_item_time {
-	margin-top: 4px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-top: 10px;
 	color: rgba(0, 0, 0, 0.5);
+}
+.icon_copy i {
+	cursor: pointer;
+	font-size: 18px;
 }
 
 .right_align {

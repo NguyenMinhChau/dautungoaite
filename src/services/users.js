@@ -120,3 +120,16 @@ export const updateAccountSV = async (props = {}) => {
 		alert(err?.response?.data?.message || 'Update data failed!');
 	}
 };
+
+// CHAT
+export const getAllChatByEmailSV = async (props = {}) => {
+	const { emailUser, setDataMessage, token } = props;
+	try {
+		const resGet = await userGet(`message/${emailUser}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		setDataMessage(resGet?.metadata);
+	} catch (err) {
+		alert(err?.response?.data?.message || 'Load data failed!');
+	}
+};
