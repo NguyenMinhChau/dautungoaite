@@ -130,6 +130,7 @@ export const getAllChatByEmailSV = async (props = {}) => {
 		});
 		setDataMessage(resGet?.metadata);
 	} catch (err) {
+		console.log(err);
 		alert(err?.response?.data?.message || 'Load data failed!');
 	}
 };

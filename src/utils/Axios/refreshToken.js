@@ -15,7 +15,8 @@ const requestRefreshToken = async (
 		if (accessToken) {
 			const decodedToken = await jwt_decode(accessToken);
 			const date = new Date();
-			if (decodedToken.exp < date.getTime() / 1000) {
+			// console.log(decodedToken.exp < date.getTime() / 1000);
+			if (decodedToken.exp > date.getTime() / 1000) {
 				const res = await axiosUtils.refreshToken(
 					`token/refresh/${currentUser?.email}`,
 				);
