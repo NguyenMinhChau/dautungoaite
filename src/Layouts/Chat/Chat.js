@@ -160,6 +160,7 @@ function Chat() {
 						) : (
 							<>
 								{DATA_CHAT?.map((item, index) => {
+									console.log(item);
 									return (
 										<div
 											className={`${cx(
@@ -202,8 +203,7 @@ function Chat() {
 														'content_item_text',
 													)}`}
 													dangerouslySetInnerHTML={{
-														__html:
-															item.text || '---',
+														__html: item?.text,
 													}}
 												></div>
 											</div>
@@ -331,7 +331,7 @@ function Chat() {
 								ref={textareaRef}
 							/>
 							<div className={`${cx('file_icon_container')}`}>
-								<div
+								{/* <div
 									className={`${cx('file_icon_item')}`}
 									onClick={toggleEmoji}
 								>
@@ -339,7 +339,7 @@ function Chat() {
 										className="bx bx-smile"
 										style={{ color: '#f8c000' }}
 									></i>
-								</div>
+								</div> */}
 								<label
 									className={`${cx('file_icon_item')}`}
 									style={{ marginBottom: 0 }}
@@ -369,7 +369,7 @@ function Chat() {
 							></i>
 						</div>
 					</div>
-					{openEmoji && (
+					{/* {openEmoji && (
 						<div className={`${cx('comment_emoji_container')}`}>
 							<Picker
 								onEmojiClick={(emojiObject, e) => {
@@ -377,7 +377,7 @@ function Chat() {
 								}}
 							/>
 						</div>
-					)}
+					)} */}
 				</div>
 			</div>
 		</div>
