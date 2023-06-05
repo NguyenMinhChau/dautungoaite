@@ -55,10 +55,18 @@ function Chat() {
 	};
 	useEffect(() => {
 		socket.on('get_messages', (data) => {
-			setDataMessage(data);
-			// setDataMessage((prev) => [...prev, data]);
+			// setDataMessage(data);
+			setDataMessage((prev) => [...prev, data]);
 		});
-		requestRefreshToken(currentUser, getAllChat, state, dispatch, actions);
+		if (dataMessage.length > 0) {
+			requestRefreshToken(
+				currentUser,
+				getAllChat,
+				state,
+				dispatch,
+				actions,
+			);
+		}
 		const handleScrollTop = () => {
 			if (
 				contentChatRef.current.scrollTop +
@@ -112,14 +120,21 @@ function Chat() {
 				to: to,
 				message: chat,
 			});
-			// setDataMessage((prev) => [
-			// 	...prev,
-			// 	{
-			// 		createdAt: new Date(),
-			// 		email: currentUser?.email,
-			// 		text: chat,
-			// 	},
-			// ]);
+			setDataMessage((prev) => [
+				...prev,
+				{
+					createdAt: new Date(),
+					email: currentUser?.email,
+					text: chat,
+				},
+			]);
+			requestRefreshToken(
+				currentUser,
+				getAllChat,
+				state,
+				dispatch,
+				actions,
+			);
 			dispatch(actions.setData({ chat: '' }));
 			setChatFiles([]);
 		}
@@ -138,11 +153,11 @@ function Chat() {
 	const handleOnCopy = () => {
 		alert('Copied');
 	};
-	const DATA_CHAT = dataMessage || [];
+	const DATA_CHAT =
+		dataMessage.slice(dataMessage.length - 20, dataMessage.length) || [];
 	const handleClearChat = () => {
 		setDataMessage([]);
 	};
-	const idUser = 'NguyenMinhChau';
 	return (
 		<div className={`${cx('container_chat')}`}>
 			<div className={`${cx('list_btn_actions')} mb8`}>
@@ -160,7 +175,6 @@ function Chat() {
 						) : (
 							<>
 								{DATA_CHAT?.map((item, index) => {
-									console.log(item);
 									return (
 										<div
 											className={`${cx(
