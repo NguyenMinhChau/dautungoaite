@@ -10,13 +10,12 @@ import {
 export const RegisterSV = async (props = {}) => {
 	const { username, email, password, setIsProcess, history } = props;
 	try {
-		const resPost = await authPost('register', {
+		await authPost('register', {
 			username,
 			email,
 			password,
 		});
 		setIsProcess(false);
-		alert(resPost?.message || 'Đăng kí thành công!');
 		history(routers.login);
 	} catch (err) {
 		setIsProcess(false);
@@ -43,7 +42,6 @@ export const LoginSV = async (props = {}) => {
 			}),
 		);
 		setIsProcess(false);
-		alert(resPost?.message || 'Đăng nhập thành công!');
 		history(routers.chat);
 	} catch (err) {
 		setIsProcess(false);
@@ -53,14 +51,13 @@ export const LoginSV = async (props = {}) => {
 export const LogoutSV = async (props = {}) => {
 	const { email, history, dispatch } = props;
 	try {
-		const resPost = await authPost(`logout/${email}`, {});
+		await authPost(`logout/${email}`, {});
 		await removeStore();
 		await dispatch(
 			actions.setData({
 				currentUser: getStore(),
 			}),
 		);
-		alert(resPost?.message || 'Đăng xuất thành công!');
 		history(routers.login);
 	} catch (err) {
 		alert(err?.response?.data?.message || 'Đăng xuất thất bại');

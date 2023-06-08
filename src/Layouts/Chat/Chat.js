@@ -222,6 +222,7 @@ function Chat() {
 						</div>
 					)}
 				</div>
+
 				<div className={`${cx('chat')}`}>
 					<div className={`${cx('chat_textarea')}`}>
 						<div className={`${cx('chat_textarea_relative')}`}>
@@ -244,6 +245,15 @@ function Chat() {
 								name="chat"
 								ref={textareaRef}
 							/>
+						</div>
+						<div
+							className={`${cx('send_icon')}`}
+							onClick={handleSendMessage}
+						>
+							<i
+								className="bx bx-send"
+								style={{ color: '#f8c000' }}
+							></i>
 						</div>
 					</div>
 				</div>
