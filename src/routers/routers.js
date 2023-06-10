@@ -22,6 +22,7 @@ const routers = {
 	sell: '/sell',
 	sellDetail: 'sell-detail',
 	user: '/user',
+	account: '/account',
 	chat: '/chat',
 
 	// USER ROUTERS

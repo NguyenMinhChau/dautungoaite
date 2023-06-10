@@ -11,6 +11,7 @@ import {
 	Buy,
 	Sell,
 	User,
+	Account,
 	Chat,
 	UserDetail,
 	Login,
@@ -21,6 +22,7 @@ import {
 	Register,
 	ForgotPwd,
 	ChangeCoin,
+	AccountDetail,
 } from '../Layouts';
 import {
 	HomeUser,
@@ -77,6 +79,8 @@ export const privateRouter = [
 	},
 	{ path: routers.user, component: User },
 	{ path: `${routers.user}/:idUser`, component: UserDetail },
+	{ path: routers.account, component: Account },
+	{ path: `${routers.account}/:idAccount`, component: AccountDetail },
 	{ path: routers.chat, component: Chat },
 	{ path: `${routers.settingCoin}/${routers.newcoin}`, component: NewCoin },
 	{

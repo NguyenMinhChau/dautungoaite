@@ -31,10 +31,9 @@ export const LoginSV = async (props = {}) => {
 		});
 		await setStore({
 			token: resPost?.metadata?.token,
-			username: resPost?.metadata?.user?.username,
 			email: resPost?.metadata?.user?.email,
 			rule: resPost?.metadata?.user?.roles,
-			id: resPost?.metadata?.user?._id,
+			id: resPost?.metadata?.user?.id,
 		});
 		await dispatch(
 			actions.setData({

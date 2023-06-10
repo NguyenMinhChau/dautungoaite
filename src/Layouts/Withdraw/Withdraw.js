@@ -1,12 +1,8 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
 import moment from 'moment';
-import {
-	getWithdraws,
-	handleEdit,
-	handleDelete,
-} from '../../services/withdraws';
 import {
 	useAppContext,
 	DataWithdraws,
@@ -73,16 +69,7 @@ function Withdraw() {
 			}, 500);
 		}
 	}, [useBebounceWithdraw]);
-	useEffect(() => {
-		getWithdraws({
-			page,
-			show,
-			dispatch,
-			state,
-			search: useBebounceWithdraw,
-			setSnackbar,
-		});
-	}, [page, show, useBebounceWithdraw]);
+	useEffect(() => {}, [page, show, useBebounceWithdraw]);
 	let dataWithdrawFlag = dataWithdraw?.data?.withdraws || dataWithdraw?.data;
 	// Modal
 	const toggleEditTrue = async (e, status, id) => {
@@ -102,56 +89,8 @@ function Withdraw() {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
 	// Edit + Delete Withdraw
-	const handleEditStatus = (data, id) => {
-		handleEdit({
-			data,
-			note: `web_${currentUser?.email}`,
-			id,
-			dispatch,
-			actions,
-			state,
-			statusCurrent,
-			statusUpdate,
-			page,
-			show,
-			search: withdraw,
-			setSnackbar,
-			setIsProcess,
-		});
-	};
-	const handleDeleteWithdraw = (data, id) => {
-		handleDelete({
-			data,
-			id,
-			dispatch,
-			state,
-			page,
-			show,
-			search: withdraw,
-			setSnackbar,
-		});
-	};
-	const deleteWithdraw = (id) => {
-		requestRefreshToken(
-			currentUser,
-			handleDeleteWithdraw,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
-	const editStatus = (id) => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			handleEditStatus,
-			state,
-			dispatch,
-			actions,
-			id,
-		);
-	};
+	const deleteWithdraw = (id) => {};
+	const editStatus = (id) => {};
 	const handleViewWithdraw = (item) => {
 		dispatch(
 			actions.setData({

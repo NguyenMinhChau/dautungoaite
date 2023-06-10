@@ -18,6 +18,7 @@ export { default as DataWithdraws } from './FakeData/Withdraws';
 export { default as DataBuys } from './FakeData/Buys';
 export { default as DataSells } from './FakeData/Sells';
 export { default as DataUsers } from './FakeData/Users';
+export { default as DataAccounts } from './FakeData/Account';
 export { default as DataDashboard } from './FakeData/Dashboard';
 export { default as DataUserBalance } from './FakeData/UserBalance';
 export { default as DataBlacklistUsers } from './FakeData/BlacklistUsers';

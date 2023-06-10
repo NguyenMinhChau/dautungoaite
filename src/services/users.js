@@ -1,126 +1,233 @@
 /* eslint-disable no-unused-vars */
 import { actions } from '../app/';
 import {
+	adminDelete,
+	adminGet,
+	adminPut,
 	userDelete,
 	userGet,
 	userPost,
 	userPut,
 } from '../utils/Axios/axiosInstance';
 
-export const getAllAccountSV = async (props = {}) => {
-	const { token, idUser, dispatch } = props;
+// USERS
+export const getAllUsersSV = async (props = {}) => {
+	const { token, dispatch, state } = props;
 	try {
-		const resGet = await userGet(`account/${idUser}`, {
+		const resGet = await adminGet(`user`, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 		dispatch(
 			actions.setData({
-				dataUser: resGet?.metadata,
+				data: {
+					...state.set.data,
+					dataUser: resGet?.metadata,
+				},
 			}),
 		);
 	} catch (err) {
 		alert(err?.response?.data?.message || 'Get data failed!');
 	}
 };
-export const createAccountSV = async (props = {}) => {
+export const updateUserSV = async (props = {}) => {
 	const {
-		username,
-		password,
-		host,
-		port,
-		token,
 		idUser,
-		dispatch,
 		setIsProcess,
-		setModalCreateAccount,
-		setDataFormCreateAccount,
+		token,
+		statusUpdate,
+		statusCurrent,
+		dispatch,
+		state,
+		setSnackbar,
+		setModalChangeRoles,
 	} = props;
 	try {
-		const resPost = await userPost(
-			`account/${idUser}`,
+		const resPut = await adminPut(
+			`user/${idUser}`,
 			{
-				username,
-				password,
-				host,
-				port,
+				roles:
+					statusUpdate.toLowerCase() || statusCurrent.toLowerCase(),
 			},
 			{ headers: { Authorization: `Bearer ${token}` } },
 		);
-		const resGet = await userGet(`account/${idUser}`, {
+		const resGet = await adminGet(`user`, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 		dispatch(
 			actions.setData({
-				dataUser: resGet?.metadata,
+				data: {
+					...state.set.data,
+					dataUser: resGet?.metadata,
+				},
 			}),
 		);
-		setDataFormCreateAccount({
-			username: '',
-			password: '',
-			host: '',
-			port: '',
-		});
 		setIsProcess(false);
-		setModalCreateAccount(false);
-		alert(resPost?.message || 'Create successfully');
+		setModalChangeRoles(false);
+		setSnackbar({
+			open: true,
+			type: 'success',
+			message: resPut?.message || 'Update successfully',
+		});
 	} catch (err) {
 		setIsProcess(false);
-		alert(err?.response?.data?.message || 'Create data failed!');
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Update data failed!',
+		});
 	}
 };
-export const deleteAccountSV = async (props = {}) => {
-	const { idAccount, token, setIsProcess, dispatch } = props;
+export const blockUserSV = async (props = {}) => {
+	const {
+		idUser,
+		token,
+		dispatch,
+		state,
+		Lock,
+		setSnackbar,
+		setIsProcessBlockUser,
+	} = props;
 	try {
-		const resDel = await userDelete(
-			`account/${idAccount}`,
-			{},
+		const resPut = await adminPut(
+			`user/${idUser}`,
+			{
+				Lock: Lock,
+			},
 			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		const resGet = await adminGet(`user/${idUser}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				edit: {
+					...state.set.edit,
+					itemData: resGet?.metadata,
+				},
+			}),
+		);
+		setIsProcessBlockUser(false);
+		setSnackbar({
+			open: true,
+			type: 'success',
+			message: !Lock
+				? 'Unblock user successfully'
+				: 'Block user successfully',
+		});
+	} catch (err) {
+		setIsProcessBlockUser(false);
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Block user failed!',
+		});
+	}
+};
+export const changePasswordUserSV = async (props = {}) => {
+	const {
+		idUser,
+		token,
+		dispatch,
+		state,
+		password,
+		setSnackbar,
+		setIsProcessChangePwd,
+	} = props;
+	try {
+		const resPut = await adminPut(
+			`user/${idUser}`,
+			{
+				password,
+			},
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		const resGet = await adminGet(`user/${idUser}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				edit: {
+					...state.set.edit,
+					itemData: resGet?.metadata,
+				},
+			}),
+		);
+		dispatch(actions.toggleModal({ ...state.toggle, modalDelete: false }));
+		setIsProcessChangePwd(false);
+		setSnackbar({
+			open: true,
+			type: 'success',
+			message: resPut?.message || 'Change password successfully',
+		});
+	} catch (err) {
+		setIsProcessChangePwd(false);
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Change password failed!',
+		});
+	}
+};
+export const getUserByIdSV = async (props = {}) => {
+	const { idUser, token, dispatch, state, setSnackbar } = props;
+	try {
+		const resGet = await adminGet(`user/${idUser}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				edit: {
+					...state.set.edit,
+					itemData: resGet?.metadata,
+				},
+			}),
+		);
+	} catch (err) {
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Get data failed!',
+		});
+	}
+};
+export const deleteUserSV = async (props = {}) => {
+	const { idUser, dispatch, state, token, setSnackbar, setIsProcess } = props;
+	try {
+		const resDel = await adminDelete(`user/${idUser}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		const resGet = await adminGet(`user`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				data: {
+					...state.set.data,
+					dataUser: resGet?.metadata,
+				},
+			}),
 		);
 		setIsProcess(false);
 		dispatch(
 			actions.toggleModal({
+				...state.toggle,
 				modalDelete: false,
 			}),
 		);
-		alert(resDel?.message || 'Delete successfully');
+		setSnackbar({
+			open: true,
+			type: 'success',
+			message: resDel?.message || 'Delete successfully',
+		});
 	} catch (err) {
 		setIsProcess(false);
-		alert(err?.response?.data?.message || 'Delete data failed!');
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Delete data failed!',
+		});
 	}
 };
-export const updateAccountSV = async (props = {}) => {
-	const {
-		idAccount,
-		setIsProcess,
-		token,
-		body,
-		setModalCreateAccount,
-		setDataFormCreateAccount,
-		setIsUpdateAccount,
-	} = props;
-	try {
-		const resPut = await userPut(
-			`account/${idAccount}`,
-			{ body },
-			{ headers: { Authorization: `Bearer ${token}` } },
-		);
-		// get account byID
-		// setDataFormCreateAccount({
-		// 	username: '',
-		// 	password: '',
-		// 	host: '',
-		// 	port: '',
-		// });
-		setIsProcess(false);
-		setIsUpdateAccount(false);
-		setModalCreateAccount(false);
-		alert(resPut?.message || 'Update successfully');
-	} catch (err) {
-		setIsProcess(false);
-		alert(err?.response?.data?.message || 'Update data failed!');
-	}
-};
-
 // CHAT
 export const getAllChatByEmailSV = async (props = {}) => {
 	const { emailUser, setDataMessage, token } = props;
@@ -132,5 +239,20 @@ export const getAllChatByEmailSV = async (props = {}) => {
 	} catch (err) {
 		console.log(err);
 		alert(err?.response?.data?.message || 'Load data failed!');
+	}
+};
+export const clearChatSV = async (props = {}) => {
+	const { emailUser, token, setDataMessage, setIsProcess } = props;
+	try {
+		const resDel = await userDelete(
+			`message/delete/${emailUser}`,
+			{ headers: { Authorization: `Bearer ${token}` } },
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		setIsProcess(false);
+		setDataMessage([]);
+	} catch (err) {
+		setIsProcess(false);
+		alert(err?.response?.data?.message || 'Clear data failed!');
 	}
 };

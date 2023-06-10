@@ -10,7 +10,7 @@ import { actions } from '../../app/';
 import { Button } from '../../components';
 import { TextareaAutosize } from '@mui/material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { getAllChatByEmailSV } from '../../services/users';
+import { clearChatSV, getAllChatByEmailSV } from '../../services/users';
 
 import moment from 'moment';
 
@@ -27,6 +27,7 @@ function Chat() {
 	const from = currentUser?.email;
 	const to = 'bot';
 	const [openScrollToBottom, setOpenScrollToBottom] = useState(false);
+	const [isProcess, setIsProcess] = useState(false);
 	const [dataMessage, setDataMessage] = useState([]);
 	const textareaRef = useRef();
 	const contentChatRef = useRef();
@@ -115,13 +116,34 @@ function Chat() {
 	const handleOnCopy = () => {};
 	const DATA_CHAT =
 		dataMessage.slice(dataMessage.length - 20, dataMessage.length) || [];
+	const clearChat = (dataToken) => {
+		clearChatSV({
+			setIsProcess,
+			emailUser: currentUser?.email,
+			token: dataToken?.token,
+			setDataMessage,
+		});
+	};
 	const handleClearChat = () => {
-		setDataMessage([]);
+		if (DATA_CHAT.length > 0) {
+			setIsProcess(true);
+			requestRefreshToken(
+				currentUser,
+				clearChat,
+				state,
+				dispatch,
+				actions,
+			);
+		}
 	};
 	return (
 		<div className={`${cx('container_chat')}`}>
 			<div className={`${cx('list_btn_actions')} mb8`}>
-				<Button className={'cancelbgc'} onClick={handleClearChat}>
+				<Button
+					className={'cancelbgc'}
+					onClick={handleClearChat}
+					isProcess={isProcess}
+				>
 					<i class="bx bx-trash mr4"></i> Clear Chat
 				</Button>
 			</div>
@@ -210,7 +232,7 @@ function Chat() {
 							</>
 						)}
 					</div>
-					{openScrollToBottom && (
+					{openScrollToBottom && DATA_CHAT.length > 0 && (
 						<div
 							className={`${cx('scroll_to_bottom')}`}
 							onClick={scrollToBottom}

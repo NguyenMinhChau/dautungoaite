@@ -11,31 +11,31 @@ import styles from './Sidebar.module.css';
 
 const cx = className.bind(styles);
 const LIST_SIDEBAR = [
-	{
-		name: 'Dashboard',
-		path: routers.dashboard,
-		icon: <Icons.DashboardIcon className={`${cx('custom-icon')}`} />,
-	},
-	{
-		name: 'Payment',
-		path: routers.payment,
-		icon: <Icons.PaymentIcon className={`${cx('custom-icon')}`} />,
-	},
-	{
-		name: 'Rate',
-		path: routers.rate,
-		icon: <Icons.RateIcon className={`${cx('custom-icon')}`} />,
-	},
-	{
-		name: 'Settings Coin',
-		path: routers.settingCoin,
-		icon: <Icons.SettingIcon className={`${cx('custom-icon')}`} />,
-	},
-	{
-		name: 'Coin Inactive',
-		path: routers.coinInactive,
-		icon: <Icons.BlockUserIcon className={`${cx('custom-icon')}`} />,
-	},
+	// {
+	// 	name: 'Dashboard',
+	// 	path: routers.dashboard,
+	// 	icon: <Icons.DashboardIcon className={`${cx('custom-icon')}`} />,
+	// },
+	// {
+	// 	name: 'Payment',
+	// 	path: routers.payment,
+	// 	icon: <Icons.PaymentIcon className={`${cx('custom-icon')}`} />,
+	// },
+	// {
+	// 	name: 'Rate',
+	// 	path: routers.rate,
+	// 	icon: <Icons.RateIcon className={`${cx('custom-icon')}`} />,
+	// },
+	// {
+	// 	name: 'Settings Coin',
+	// 	path: routers.settingCoin,
+	// 	icon: <Icons.SettingIcon className={`${cx('custom-icon')}`} />,
+	// },
+	// {
+	// 	name: 'Coin Inactive',
+	// 	path: routers.coinInactive,
+	// 	icon: <Icons.BlockUserIcon className={`${cx('custom-icon')}`} />,
+	// },
 	{
 		name: 'Deposits',
 		path: routers.deposits,
@@ -46,25 +46,30 @@ const LIST_SIDEBAR = [
 		path: routers.withdraw,
 		icon: <Icons.WithdrawIcon className={`${cx('custom-icon')}`} />,
 	},
-	{
-		name: 'Buy',
-		path: routers.buy,
-		icon: <Icons.BuyIcon className={`${cx('custom-icon')}`} />,
-	},
-	{
-		name: 'Sell',
-		path: routers.sell,
-		icon: <Icons.SellIcon className={`${cx('custom-icon')}`} />,
-	},
-	{
-		name: 'Change Coin',
-		path: routers.changeCoin,
-		icon: <Icons.ChangeCoinIcon className={`${cx('custom-icon')}`} />,
-	},
+	// {
+	// 	name: 'Buy',
+	// 	path: routers.buy,
+	// 	icon: <Icons.BuyIcon className={`${cx('custom-icon')}`} />,
+	// },
+	// {
+	// 	name: 'Sell',
+	// 	path: routers.sell,
+	// 	icon: <Icons.SellIcon className={`${cx('custom-icon')}`} />,
+	// },
+	// {
+	// 	name: 'Change Coin',
+	// 	path: routers.changeCoin,
+	// 	icon: <Icons.ChangeCoinIcon className={`${cx('custom-icon')}`} />,
+	// },
 	{
 		name: 'User',
 		path: routers.user,
 		icon: <Icons.UserIcon className={`${cx('custom-icon')}`} />,
+	},
+	{
+		name: 'Account',
+		path: routers.account,
+		icon: <Icons.AccountIcon className={`${cx('custom-icon')}`} />,
 	},
 	{
 		name: 'Chat',

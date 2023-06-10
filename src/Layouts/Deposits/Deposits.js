@@ -33,8 +33,10 @@ import Skeleton from 'react-loading-skeleton';
 import {
 	addDepositsSV,
 	deleteDepositsSV,
+	getAllDepositsSV,
 	updateDepositsSV,
 } from '../../services/deposits';
+import { formatUSD } from '../../utils/format/FormatMoney';
 
 const cx = className.bind(styles);
 
@@ -51,19 +53,22 @@ function Deposits() {
 	} = state.set;
 	const { modalStatus, modalDelete } = state.toggle;
 	const [isProcess, setIsProcess] = useState(false);
-	const [modalCreateDeposits, setModalCreateDeposits] = useState(false);
-	const [isUpdate, setIsUpdate] = useState(false);
-	const [dataCreateDeposits, setDataCreateDeposits] = useState({
-		quantity: '',
-		pathImage: '',
-	});
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		type: '',
 		message: '',
 	});
+	const getAllDP = (dataToken) => {
+		getAllDepositsSV({
+			token: dataToken?.token,
+			dispatch,
+			state,
+			setSnackbar,
+		});
+	};
 	useEffect(() => {
 		document.title = `Deposits | ${process.env.REACT_APP_TITLE_WEB}`;
+		requestRefreshToken(currentUser, getAllDP, state, dispatch, actions);
 	}, []);
 	const handleCloseSnackbar = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -87,7 +92,18 @@ function Deposits() {
 		}
 	}, [useDebounceDeposit]);
 	useEffect(() => {}, [page, show, useDebounceDeposit]);
-	let dataDepositsFlag = dataDeposits?.deposits || [];
+	let dataDepositsFlag = dataDeposits || [];
+	const stringlwc = (str) => {
+		return str?.toString()?.toLowerCase();
+	};
+	if (deposits) {
+		dataDepositsFlag = dataDepositsFlag.filter((item) => {
+			return (
+				stringlwc(item?.quantity).includes(deposits.toLowerCase()) ||
+				stringlwc(item?.status).includes(deposits.toLowerCase())
+			);
+		});
+	}
 	// Modal
 	const toggleEditTrue = async (e, status, id) => {
 		await localStoreUtils.setStore({
@@ -105,20 +121,6 @@ function Deposits() {
 	const modalDeleteFalse = (e) => {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
-	const openModalCreateDeposits = (e) => {
-		e.stopPropagation();
-		setModalCreateDeposits(true);
-	};
-	const closeModalCreateDeposits = (e) => {
-		e.stopPropagation();
-		setModalCreateDeposits(false);
-	};
-	const handleChangeCreateDeposits = (e) => {
-		setDataCreateDeposits({
-			...dataCreateDeposits,
-			[e.target.name]: e.target.value,
-		});
-	};
 	// Edit + Delete Deposits
 	const deleteDeposits = (dataToken, id) => {
 		deleteDepositsSV({
@@ -126,6 +128,8 @@ function Deposits() {
 			token: dataToken?.token,
 			setIsProcess,
 			dispatch,
+			state,
+			setSnackbar,
 		});
 	};
 	const handleDeleteDeposits = (id) => {
@@ -139,121 +143,75 @@ function Deposits() {
 			id,
 		);
 	};
-	const editStatus = (id) => {};
-	const handleViewDeposits = (item) => {
-		dispatch(
-			actions.setData({
-				edit: {
-					...state.set.edit,
-					id: item._id || item.id,
-					itemData: item,
-				},
-			}),
-		);
-	};
-	const createDeposits = (dataToken) => {
-		addDepositsSV({
-			idUser: currentUser?.id,
-			token: dataToken?.token,
-			quantity: dataCreateDeposits.quantity,
-			pathImage: dataCreateDeposits.pathImage,
-			setIsProcess,
-			setModalCreateDeposits,
-		});
-	};
-	const handleCreateDeposits = () => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			createDeposits,
-			state,
-			dispatch,
-			actions,
-		);
-	};
-	const updateDeposits = (dataToken, id) => {
+	const editStatus = (dataToken, id) => {
 		updateDepositsSV({
 			idDeposits: id,
-			idUser: currentUser?.id,
 			token: dataToken?.token,
-			body: dataCreateDeposits,
+			statusUpdate,
+			statusCurrent,
 			setIsProcess,
-			setModalCreateDeposits,
 			dispatch,
+			state,
+			setSnackbar,
 		});
 	};
-	const handleUpdateDeposits = (id) => {
+	const handleEditStatus = (id) => {
 		setIsProcess(true);
 		requestRefreshToken(
 			currentUser,
-			updateDeposits,
+			editStatus,
 			state,
 			dispatch,
 			actions,
 			id,
 		);
 	};
+	const handleViewDeposits = (item) => {
+		dispatch(
+			actions.setData({
+				edit: {
+					itemData: item,
+				},
+			}),
+		);
+	};
 	function RenderBodyTable({ data }) {
 		return (
 			<>
 				{data.map((item, index) => {
-					const sendReceived = {
-						send: {
-							icon: <Icons.SendIcon />,
-							title: 'Send',
-							number: numberUtils.formatVND(item?.amountVnd),
-						},
-						received: {
-							icon: <Icons.ReceivedIcon />,
-							title: 'Received',
-							number: numberUtils.formatUSD(item?.amount),
-						},
-					};
-					const username = dataUser.dataUser.find(
-						(x) => x?.payment.email === item.user,
-					)?.payment.username;
-					const infoUser = {
-						name: username,
-						email: item.user,
-						path: `@${username?.replace(' ', '-')}`,
-					};
+					const username = dataUser.find(
+						(x) => x?.id === item.IdUser,
+					)?.email;
 					return (
 						<tr key={index}>
 							<td>{handleUtils.indexTable(page, show, index)}</td>
-							<td className="item-w100">{item.code}</td>
-							<td>
-								<TrObjectIcon item={sendReceived} />
+							<td className="item-w200">
+								{username || <Skeleton width={50} />}
 							</td>
-							<td className="item-w150">
-								<TrObjectNoIcon item={infoUser} />
+							<td className="item-w100">
+								{formatUSD(item?.quantity || 0) || (
+									<Skeleton width={50} />
+								)}
 							</td>
 							<td className="item-w100">
 								{moment(item.createdAt).format(
 									'DD/MM/YYYY HH:mm:ss',
 								)}
 							</td>
-							<td className="item-w150">
-								{item?.createBy ? (
-									item?.createBy
-								) : (
-									<Skeleton width={50} />
-								)}
-							</td>
 							<td>
 								<TrStatus
 									item={item.status}
 									onClick={(e) =>
-										toggleEditTrue(e, item.status, item._id)
+										toggleEditTrue(e, item.status, item.id)
 									}
 								/>
 							</td>
-
 							<td>
 								<ActionsTable
 									view
-									linkView={`${routers.deposits}/${item._id}`}
+									linkView={`${routers.deposits}/${item.id}`}
 									onClickDel={(e) =>
-										modalDeleteTrue(e, item._id)
+										modalDeleteTrue(e, item.id)
 									}
 									onClickView={() => handleViewDeposits(item)}
 								></ActionsTable>
@@ -279,9 +237,6 @@ function Deposits() {
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
-				textBtnNew="Create Deposits"
-				classNameButton="completebgc"
-				onCreate={openModalCreateDeposits}
 			>
 				<RenderBodyTable data={dataDepositsFlag} />
 			</General>
@@ -292,7 +247,9 @@ function Deposits() {
 					openModal={toggleEditTrue}
 					closeModal={toggleEditFalse}
 					classNameButton="vipbgc"
-					onClick={() => editStatus(currentUser?.idUpdate || edit.id)}
+					onClick={() =>
+						handleEditStatus(currentUser?.idUpdate || edit.id)
+					}
 					isProcess={isProcess}
 				>
 					<p className="modal-delete-desc">
@@ -320,35 +277,6 @@ function Deposits() {
 					<p className="modal-delete-desc">
 						Are you sure to delete this deposits?
 					</p>
-				</Modal>
-			)}
-			{modalCreateDeposits && (
-				<Modal
-					titleHeader="Create Deposits"
-					actionButtonText={isUpdate ? 'Update' : 'Send'}
-					classNameButton={'confirmbgc'}
-					openModal={openModalCreateDeposits}
-					closeModal={closeModalCreateDeposits}
-					isProcess={isProcess}
-					disabled={isProcess}
-					onClick={
-						isUpdate
-							? () => handleUpdateDeposits(edit?.id)
-							: handleCreateDeposits
-					}
-				>
-					<FormInput
-						label="Quantity"
-						placeholder="Enter quantity"
-						name="quantity"
-						onChange={handleChangeCreateDeposits}
-					/>
-					<FormInput
-						label="Path mage"
-						placeholder="Enter image"
-						name="pathImage"
-						onChange={handleChangeCreateDeposits}
-					/>
 				</Modal>
 			)}
 		</>

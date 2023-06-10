@@ -1,16 +1,37 @@
 /* eslint-disable no-unused-vars */
 import { actions } from '../app/';
-import {
-	userDelete,
-	userGet,
-	userPost,
-	userPut,
-} from '../utils/Axios/axiosInstance';
+import { adminDelete, adminGet, adminPut } from '../utils/Axios/axiosInstance';
 
-export const getByIdDepositsSV = async (props = {}) => {
-	const { idDeposits, token, dispatch } = props;
+export const getAllDepositsSV = async (props = {}) => {
+	const { token, dispatch, state, setSnackbar } = props;
 	try {
-		const resGet = await userGet(`deposit/${idDeposits}`, {
+		const resGet = await adminGet('deposit', {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		const resGetUser = await adminGet(`user`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				data: {
+					...state.set.data,
+					dataDeposits: resGet?.metadata,
+					dataUser: resGetUser?.metadata,
+				},
+			}),
+		);
+	} catch (err) {
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Get data failed!',
+		});
+	}
+};
+export const getDepositByIdSV = async (props = {}) => {
+	const { idDeposits, token, dispatch, setSnackbar } = props;
+	try {
+		const resGet = await adminGet(`deposit/${idDeposits}`, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 		dispatch(
@@ -21,59 +42,82 @@ export const getByIdDepositsSV = async (props = {}) => {
 			}),
 		);
 	} catch (err) {
-		alert(err?.response?.data?.message || 'Get data failed!');
-	}
-};
-export const getByIdUserDepositsSV = async (props = {}) => {
-	const { idUser, token, dispatch } = props;
-	try {
-		const resGet = await userGet(`deposit/${idUser}`, {
-			headers: { Authorization: `Bearer ${token}` },
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Get data failed!',
 		});
-		dispatch(
-			actions.setData({
-				edit: {
-					itemData: resGet?.metadata,
-				},
-			}),
-		);
-	} catch (err) {
-		alert(err?.response?.data?.message || 'Get data failed!');
 	}
 };
-export const addDepositsSV = async (props = {}) => {
+export const updateDepositsSV = async (props = {}) => {
 	const {
-		idUser,
+		idDeposits,
 		token,
-		quantity,
-		pathImage,
+		statusUpdate,
+		statusCurrent,
 		setIsProcess,
-		setModalCreateDeposits,
+		dispatch,
+		state,
+		setSnackbar,
 	} = props;
 	try {
-		const resPost = await userPost(
-			`deposit/${idUser}`,
-			{
-				quantity,
-				pathImage,
-			},
+		const resPut = await adminPut(
+			`deposit/${idDeposits}`,
+			{ status: statusUpdate || statusCurrent },
 			{ headers: { Authorization: `Bearer ${token}` } },
 		);
+		const resGet = await adminGet('deposit', {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		const resGetUser = await adminGet(`user`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				data: {
+					...state.set.data,
+					dataDeposits: resGet?.metadata,
+					dataUser: resGetUser?.metadata,
+				},
+			}),
+		);
 		setIsProcess(false);
-		setModalCreateDeposits(false);
-		alert(resPost?.message || 'Add data successfully!');
+		dispatch(actions.toggleModal({ ...state.toggle, modalStatus: false }));
+		setSnackbar({
+			open: true,
+			type: 'success',
+			message: resPut?.message || 'Update data successfully!',
+		});
 	} catch (err) {
 		setIsProcess(false);
-		alert(err?.response?.data?.message || 'Add data failed!');
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Update data failed!',
+		});
 	}
 };
 export const deleteDepositsSV = async (props = {}) => {
-	const { idDeposits, token, setIsProcess, dispatch } = props;
+	const { idDeposits, token, setIsProcess, dispatch, state, setSnackbar } =
+		props;
 	try {
-		const resDel = await userDelete(
-			`deposit/${idDeposits}`,
-			{},
-			{ headers: { Authorization: `Bearer ${token}` } },
+		const resDel = await adminDelete(`deposit/${idDeposits}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		const resGet = await adminGet('deposit', {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		const resGetUser = await adminGet(`user`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		dispatch(
+			actions.setData({
+				data: {
+					...state.set.data,
+					dataDeposits: resGet?.metadata,
+					dataUser: resGetUser?.metadata,
+				},
+			}),
 		);
 		setIsProcess(false);
 		dispatch(
@@ -81,33 +125,17 @@ export const deleteDepositsSV = async (props = {}) => {
 				modalDelete: false,
 			}),
 		);
-		alert(resDel?.message || 'Delete data successfully!');
+		setSnackbar({
+			open: true,
+			type: 'success',
+			message: resDel?.message || 'Delete data successfully!',
+		});
 	} catch (err) {
 		setIsProcess(false);
-		alert(err?.response?.data?.message || 'Delete data failed!');
-	}
-};
-export const updateDepositsSV = async (props = {}) => {
-	const {
-		idDeposits,
-		idUser,
-		token,
-		body,
-		setIsProcess,
-		setModalCreateDeposits,
-		dispatch,
-	} = props;
-	try {
-		const resPut = await userPut(
-			`deposit/${idUser}`,
-			{ body },
-			{ headers: { Authorization: `Bearer ${token}` } },
-		);
-		setIsProcess(false);
-		setModalCreateDeposits(false);
-		alert(resPut?.message || 'Update data successfully!');
-	} catch (err) {
-		setIsProcess(false);
-		alert(err?.response?.data?.message || 'Update data failed!');
+		setSnackbar({
+			open: true,
+			type: 'error',
+			message: err?.response?.data?.message || 'Delete data failed!',
+		});
 	}
 };

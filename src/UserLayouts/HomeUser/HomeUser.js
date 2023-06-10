@@ -11,7 +11,6 @@ import {
 	useDebounce,
 } from '../../utils';
 import { actions } from '../../app/';
-import { getCoinsUser } from '../../services/coins';
 import { General } from '../../Layouts';
 import { TrObjectImage } from '../../components/TableData/TableData';
 import moment from 'moment';

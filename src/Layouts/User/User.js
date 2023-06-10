@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -17,14 +18,13 @@ import { TrStatus } from '../../components/TableData/TableData';
 import routers from '../../routers/routers';
 import { actions } from '../../app/';
 import { General } from '../';
-import { Modal, ActionsTable, SelectStatus, FormInput } from '../../components';
+import { Modal, ActionsTable, SelectStatus } from '../../components';
 import styles from './User.module.css';
 import moment from 'moment';
 import {
-	getAllAccountSV,
-	createAccountSV,
-	deleteAccountSV,
-	updateAccountSV,
+	getAllUsersSV,
+	updateUserSV,
+	deleteUserSV,
 } from '../../services/users';
 
 const cx = className.bind(styles);
@@ -42,38 +42,27 @@ function User() {
 		pagination: { page, show },
 		searchValues: { user },
 	} = state.set;
-	const { modalDelete, modalStatus } = state.toggle;
+	const { modalDelete } = state.toggle;
 	const [isProcess, setIsProcess] = useState(false);
-	const [modalChangeRule, setModalChangeRule] = useState(false);
-	const [modalCreateAccount, setModalCreateAccount] = useState(false);
-	const [isUpdateAccount, setIsUpdateAccount] = useState(false);
-	const [dataFormCreateAccount, setDataFormCreateAccount] = useState({
-		username: '',
-		password: '',
-		host: '',
-		port: '',
-	});
+	const [modalChangeRoles, setModalChangeRoles] = useState(false);
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		type: '',
 		message: '',
 	});
-	const getAllAccount = (dataToken) => {
-		getAllAccountSV({
+	let showPage = 10;
+	const start = (page - 1) * showPage + 1;
+	const end = start + showPage - 1;
+	const getAllUsers = (dataToken) => {
+		getAllUsersSV({
 			token: dataToken?.token,
 			dispatch,
-			idUser: currentUser?.id,
+			state,
 		});
 	};
 	useEffect(() => {
 		document.title = `User | ${process.env.REACT_APP_TITLE_WEB}`;
-		requestRefreshToken(
-			currentUser,
-			getAllAccount,
-			state,
-			dispatch,
-			actions,
-		);
+		requestRefreshToken(currentUser, getAllUsers, state, dispatch, actions);
 	}, []);
 	const handleCloseSnackbar = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -97,31 +86,27 @@ function User() {
 		}
 	}, [useDebounceUser]);
 	useEffect(() => {}, [page, show, useDebounceUser]);
-	//Search Data Users
-	let dataUserFlag = dataUser?.dataUser || [];
-	const toggleEditTrue = async (e, status, id) => {
-		await localStoreUtils.setStore({
-			...currentUser,
-			idUpdate: id,
-		});
-		deleteUtils.statusTrue(e, status, id, dispatch, state, actions);
-	};
-	const toggleEditFalse = (e) => {
-		return deleteUtils.statusFalse(e, dispatch, state, actions);
-	};
+	let dataUserFlag = dataUser || [];
+	if (user) {
+		dataUserFlag = dataUserFlag.filter(
+			(item) =>
+				item.email.toLowerCase().includes(user.toLowerCase()) ||
+				item.roles.toLowerCase().includes(user.toLowerCase()),
+		);
+	}
 	const modalDeleteTrue = (e, id) => {
 		return deleteUtils.deleteTrue(e, id, dispatch, state, actions);
 	};
 	const modalDeleteFalse = (e) => {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
-	const toggleEditRuleTrue = async (e, status, id) => {
+	const toggleEditRolesTrue = async (e, status, id) => {
 		e.stopPropagation();
 		await localStoreUtils.setStore({
 			...currentUser,
 			idUpdate: id,
 		});
-		setModalChangeRule(true);
+		setModalChangeRoles(true);
 		dispatch(
 			actions.setData({
 				edit: { ...state.set.edit, id },
@@ -129,10 +114,10 @@ function User() {
 			}),
 		);
 	};
-	const toggleEditRuleFalse = async (e) => {
+	const toggleEditRolesFalse = async (e) => {
 		e.stopPropagation();
 		await 1;
-		setModalChangeRule(false);
+		setModalChangeRoles(false);
 		dispatch(
 			actions.setData({
 				statusCurrent: '',
@@ -140,17 +125,7 @@ function User() {
 			}),
 		);
 	};
-	const openModalCreateAccount = (e) => {
-		e.stopPropagation();
-		setModalCreateAccount(true);
-	};
-	const closeModalCreateAccount = (e) => {
-		e.stopPropagation();
-		setModalCreateAccount(false);
-	};
 	const handleViewUser = (item) => {
-		// setIsUpdateAccount(true);
-		// setModalCreateAccount(true);
 		dispatch(
 			actions.setData({
 				edit: {
@@ -161,80 +136,51 @@ function User() {
 			}),
 		);
 	};
-	const handleChangeCreateAccount = (e) => {
-		setDataFormCreateAccount({
-			...dataFormCreateAccount,
-			[e.target.name]: e.target.value,
-		});
-	};
-	const createAccount = (dataToken) => {
-		createAccountSV({
-			username: dataFormCreateAccount.username,
-			password: dataFormCreateAccount.password,
-			host: dataFormCreateAccount.host,
-			port: dataFormCreateAccount.port,
-			token: dataToken?.token,
-			dispatch,
-			idUser: currentUser?.id,
+	const updateUser = (dataToken, id) => {
+		updateUserSV({
+			idUser: id,
 			setIsProcess,
-			setModalCreateAccount,
-			setDataFormCreateAccount,
-		});
-	};
-	const handleCreateAccount = () => {
-		setIsProcess(true);
-		requestRefreshToken(
-			currentUser,
-			createAccount,
+			token: dataToken?.token,
+			statusUpdate,
+			statusCurrent,
+			dispatch,
 			state,
-			dispatch,
-			actions,
-		);
-	};
-	const updateAccount = (dataToken, id) => {
-		updateAccountSV({
-			token: dataToken?.token,
-			idAccount: id,
-			setIsProcess,
-			body: { dataFormCreateAccount },
-			setModalCreateAccount,
-			setDataFormCreateAccount,
-			setIsUpdateAccount,
+			setSnackbar,
+			setModalChangeRoles,
 		});
 	};
-	const handleUpdateAccount = (id) => {
+	const handleUpdateUser = (id) => {
 		setIsProcess(true);
 		requestRefreshToken(
 			currentUser,
-			updateAccount,
+			updateUser,
 			state,
 			dispatch,
 			actions,
 			id,
 		);
 	};
-	// Delete User + Update Status User
-	const deleteAccount = (dataToken, id) => {
-		deleteAccountSV({
-			idAccount: id,
-			token: dataToken?.token,
-			setIsProcess,
+	const deleteUserSV = (dataToken, id) => {
+		deleteUserSV({
+			idUser: id,
 			dispatch,
+			state,
+			token: dataToken?.token,
+			setSnackbar,
+			setIsProcess,
 		});
 	};
-	const deleteUser = (id) => {
+	const handleDeleteUser = (id) => {
 		setIsProcess(true);
 		requestRefreshToken(
 			currentUser,
-			deleteAccount,
+			deleteUserSV,
 			state,
 			dispatch,
 			actions,
 			id,
 		);
 	};
-	const editStatus = (id) => {};
-	const editRuleUser = async (id) => {};
 	function RenderBodyTable({ data }) {
 		return (
 			<>
@@ -244,12 +190,13 @@ function User() {
 							{handleUtils.indexTable(page, show, index)}
 						</td>
 						<td className="item-w200">
-							{item.payment.username || <Skeleton width={50} />}
+							{item.email || <Skeleton width={50} />}
 						</td>
+						<td className="item-w10">
+							{item.chatIdLogin || <Skeleton width={50} />}
+						</td>
+						<td className="item-w150">{item.point || 0}</td>
 						<td className="item-w150">
-							{item.payment.email || <Skeleton width={50} />}
-						</td>
-						<td className="item-w100">
 							{moment(item.createdAt).format(
 								'DD/MM/YYYY HH:mm:ss',
 							) || <Skeleton width={30} />}
@@ -257,35 +204,20 @@ function User() {
 						<td>
 							<TrStatus
 								item={
-									item.payment.rule.charAt(0).toUpperCase() +
-									item.payment.rule.slice(1).toLowerCase()
+									item.roles.charAt(0).toUpperCase() +
+									item.roles.slice(1).toLowerCase()
 								}
 								onClick={(e) =>
-									toggleEditRuleTrue(
-										e,
-										item.payment.rule,
-										item._id,
-									)
-								}
-							/>
-						</td>
-						<td>
-							<TrStatus
-								item={
-									item.rank.charAt(0).toUpperCase() +
-									item.rank.slice(1).toLowerCase()
-								}
-								onClick={(e) =>
-									toggleEditTrue(e, item.rank, item._id)
+									toggleEditRolesTrue(e, item.roles, item.id)
 								}
 							/>
 						</td>
 						<td>
 							<ActionsTable
 								view
-								linkView={`${routers.user}/${item._id}`}
+								linkView={`${routers.user}/${item.id}`}
 								onClickView={() => handleViewUser(item)}
-								onClickDel={(e) => modalDeleteTrue(e, item._id)}
+								onClickDel={(e) => modalDeleteTrue(e, item.id)}
 							></ActionsTable>
 						</td>
 					</tr>
@@ -299,53 +231,39 @@ function User() {
 				className={cx('user')}
 				valueSearch={user}
 				nameSearch="user"
-				dataFlag={dataUserFlag}
 				dataHeaders={headers}
-				totalData={
-					dataUser?.total ||
-					dataUser?.data?.totalSearch ||
-					dataUser?.totalSearch
-				}
+				totalData={dataUser?.length}
 				handleCloseSnackbar={handleCloseSnackbar}
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
-				textBtnNew="Create Account"
-				classNameButton={'completebgc'}
-				onCreate={openModalCreateAccount}
+				PaginationCus={true}
+				startPagiCus={start}
+				endPagiCus={end}
+				dataPagiCus={dataUserFlag?.filter((row, index) => {
+					if (index + 1 >= start && index + 1 <= end) return true;
+				})}
 			>
-				<RenderBodyTable data={dataUserFlag} />
+				<RenderBodyTable
+					data={dataUserFlag?.filter((row, index) => {
+						if (index + 1 >= start && index + 1 <= end) return true;
+					})}
+				/>
 			</General>
-			{modalStatus && (
+			{modalChangeRoles && (
 				<Modal
-					titleHeader="Change Rank"
+					titleHeader="Change Roles"
 					actionButtonText="Submit"
-					openModal={toggleEditTrue}
-					closeModal={toggleEditFalse}
-					classNameButton="vipbgc"
-					onClick={() => editStatus(currentUser?.idUpdate || edit.id)}
-					isProcess={isProcess}
-				>
-					<p className="modal-delete-desc">
-						Are you sure change rank this user?
-					</p>
-					<SelectStatus rank />
-				</Modal>
-			)}
-			{modalChangeRule && (
-				<Modal
-					titleHeader="Change Rule"
-					actionButtonText="Submit"
-					openModal={toggleEditRuleTrue}
-					closeModal={toggleEditRuleFalse}
+					openModal={toggleEditRolesTrue}
+					closeModal={toggleEditRolesFalse}
 					classNameButton="vipbgc"
 					onClick={() =>
-						editRuleUser(currentUser?.idUpdate || edit.id)
+						handleUpdateUser(currentUser?.idUpdate || edit.id)
 					}
 					isProcess={isProcess}
 				>
 					<p className="modal-delete-desc">
-						Are you sure change rule this user?
+						Are you sure change roles this user?
 					</p>
 					<SelectStatus ruleUser />
 				</Modal>
@@ -357,55 +275,13 @@ function User() {
 					openModal={modalDeleteTrue}
 					closeModal={modalDeleteFalse}
 					classNameButton="cancelbgc"
-					onClick={() => deleteUser(edit.id)}
+					onClick={() => handleDeleteUser(edit.id)}
 					isProcess={isProcess}
 					disabled={isProcess}
 				>
 					<p className="modal-delete-desc">
 						Are you sure to delete this user?
 					</p>
-				</Modal>
-			)}
-			{modalCreateAccount && (
-				<Modal
-					titleHeader="Create Account"
-					actionButtonText={isUpdateAccount ? 'Update' : 'Send'}
-					openModal={openModalCreateAccount}
-					closeModal={closeModalCreateAccount}
-					isProcess={isProcess}
-					disabled={isProcess}
-					classNameButton={'confirmbgc'}
-					onClick={
-						isUpdateAccount
-							? () => handleUpdateAccount(edit?.id)
-							: handleCreateAccount
-					}
-				>
-					<FormInput
-						label="Username"
-						name="username"
-						onChange={handleChangeCreateAccount}
-						placeholder="Enter username"
-					/>
-					<FormInput
-						label="Password"
-						name="password"
-						onChange={handleChangeCreateAccount}
-						placeholder="Enter password"
-						showPwd
-					/>
-					<FormInput
-						label="Host"
-						name="host"
-						onChange={handleChangeCreateAccount}
-						placeholder="Enter host"
-					/>
-					<FormInput
-						label="Port"
-						name="port"
-						onChange={handleChangeCreateAccount}
-						placeholder="Enter port"
-					/>
 				</Modal>
 			)}
 		</>

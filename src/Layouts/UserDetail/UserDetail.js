@@ -11,7 +11,6 @@ import {
 	Icons,
 	Modal,
 	Image,
-	SelectValue,
 	ModalViewImage,
 	SnackbarCp,
 } from '../../components';
@@ -20,16 +19,17 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import {
 	useAppContext,
 	requestRefreshToken,
-	textUtils,
 	deleteUtils,
 	formUtils,
-	searchUtils,
 	refreshPage,
-	axiosUtils,
-	numberUtils,
 } from '../../utils';
 import { actions } from '../../app/';
 import styles from './UserDetail.module.css';
+import {
+	blockUserSV,
+	changePasswordUserSV,
+	getUserByIdSV,
+} from '../../services/users';
 
 const cx = className.bind(styles);
 
@@ -41,32 +41,31 @@ function UserDetail() {
 		currentUser,
 		pagination: { page, show },
 		form: { password },
-		searchValues: { coin },
-		data: { dataSettingCoin },
-		changeCoin,
-		quantityCoin,
 	} = state.set;
 	const { modalDelete, selectStatus } = state.toggle;
-	const [isProcessFee, setIsProcessFee] = useState(false);
 	const [isModalImage, setIsModalImage] = useState(false);
 	const [indexImage, setIndexImage] = useState(0);
-	const [isProcessCoin, setIsProcessCoin] = useState(false);
 	const [isProcessChangePwd, setIsProcessChangePwd] = useState(false);
 	const [isProcessBlockUser, setIsProcessBlockUser] = useState(false);
 	const [isProcessRefreshPwd, setIsProcessRefreshPwd] = useState(false);
-	const [feeValue, setFeeValue] = useState(
-		edit?.itemData && edit.itemData.fee,
-	);
-	const [dataCoin, setDataCoin] = useState([]);
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		type: '',
 		message: '',
 	});
 	const x = edit?.itemData;
-
+	const getUserById = (dataToken) => {
+		getUserByIdSV({
+			idUser,
+			token: dataToken?.token,
+			dispatch,
+			state,
+			setSnackbar,
+		});
+	};
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
+		requestRefreshToken(currentUser, getUserById, state, dispatch, actions);
 	}, []);
 	const handleCloseSnackbar = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -78,38 +77,8 @@ function UserDetail() {
 		});
 	};
 	useEffect(() => {}, [page, show]);
-	const changeFee = (e) => {
-		setFeeValue(e.target.value);
-	};
-	const changeQuantity = (e) => {
-		dispatch(
-			actions.setData({
-				quantityCoin: e.target.value,
-			}),
-		);
-	};
-	const handleChangeCoin = (coin) => {};
-	const toggleListCoin = () => {
-		dispatch(
-			actions.toggleModal({
-				selectStatus: !selectStatus,
-			}),
-		);
-		dispatch(
-			actions.setData({
-				pagination: {
-					...state.set.pagination,
-					page: 1,
-					show: dataSettingCoin?.total,
-				},
-			}),
-		);
-	};
 	const changeInput = (e) => {
 		return formUtils.changeForm(e, dispatch, state, actions);
-	};
-	const searchSelect = (e) => {
-		return searchUtils.logicSearch(e, dispatch, state, actions);
 	};
 	const modalChangePwdTrue = (e, id) => {
 		return deleteUtils.deleteTrue(e, id, dispatch, state, actions);
@@ -132,86 +101,67 @@ function UserDetail() {
 		setIsModalImage(false);
 		setIndexImage(0);
 	};
-
-	const updateFee = (id) => {};
-
-	const updateCoin = (id) => {};
-
-	const changePwd = (id) => {};
-
-	const refreshPwd = async (id) => {};
-
-	const onBlockUser = (id) => {};
-
-	const onUnblockUser = (id) => {};
-	const DATA_COINS =
-		dataCoin?.map((coin) => {
-			return {
-				name: coin.symbol,
-			};
-		}) || [];
-	DATA_COINS.unshift({ name: 'USDT' });
-	const uniqueDataCoins = DATA_COINS.filter(
-		(v, i, a) => a.findIndex((t) => t.name === v.name) === i,
-	);
-	let DataCoinFlag = [];
+	const handleChangePassword = (dataToken) => {
+		changePasswordUserSV({
+			idUser,
+			token: dataToken?.token,
+			dispatch,
+			state,
+			password,
+			setSnackbar,
+			setIsProcessChangePwd,
+		});
+	};
+	const changePwd = () => {
+		dispatch(actions.toggleModal({ ...state.toggle, modalDelete: false }));
+		setSnackbar({
+			open: true,
+			type: 'info',
+			message: 'Functions under development!',
+		});
+	};
+	const refreshPwd = async () => {
+		setSnackbar({
+			open: true,
+			type: 'info',
+			message: 'Functions under development!',
+		});
+	};
+	const handleBlockSV = (dataToken) => {
+		blockUserSV({
+			idUser,
+			token: dataToken?.token,
+			dispatch,
+			state,
+			Lock: !x?.Lock,
+			setSnackbar,
+			setIsProcessBlockUser,
+		});
+	};
+	const onBlockUser = () => {
+		setIsProcessBlockUser(true);
+		requestRefreshToken(
+			currentUser,
+			handleBlockSV,
+			state,
+			dispatch,
+			actions,
+		);
+	};
 	const URL_SERVER =
 		process.env.REACT_APP_TYPE === 'development'
 			? process.env.REACT_APP_URL_SERVER
 			: process.env.REACT_APP_URL_SERVER_PRODUCTION;
-	function ItemRender({
-		title,
-		info,
-		bankInfo,
-		methodBank,
-		nameAccount,
-		numberAccount,
-	}) {
+	function ItemRender({ title, info, colorInfo }) {
 		return (
 			<div className="detail-item">
 				<div className="detail-title" style={{ minWidth: '120px' }}>
 					{title}
 				</div>
 				<div className={`${cx('detail-status')}`}>
-					{bankInfo ? (
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'flex-end',
-							}}
-						>
-							<span className="info">
-								{methodBank ? (
-									methodBank
-								) : (
-									<Skeleton width={30} />
-								)}
-							</span>
-							<span className="info">
-								{nameAccount ? (
-									nameAccount
-								) : (
-									<Skeleton width={30} />
-								)}
-							</span>
-							<span className="info">
-								{numberAccount ? (
-									numberAccount
-								) : (
-									<Skeleton width={30} />
-								)}
-							</span>
-						</div>
-					) : (
-						<span className="info">
-							{info || info === 0 ? (
-								info
-							) : (
-								<Skeleton width={30} />
-							)}
-						</span>
-					)}
+					<span className={`info ${colorInfo}`}>
+						{info || info === 0 ? info : <Skeleton width={30} />}
+					</span>
 				</div>
 			</div>
 		);
@@ -278,58 +228,14 @@ function UserDetail() {
 					typeSnackbar={snackbar.type}
 				/>
 				<div className={`${cx('detail-container')}`}>
-					<div className="detail-item">
-						<div className="detail-title">Rank</div>
-						<div className={`${cx('detail-status')}`}>
-							{x ? (
-								<>
-									<span
-										className={`status fwb ${
-											x.rank
-												.toLowerCase()
-												.replace(' ', '') + 'bgc'
-										}`}
-									>
-										{textUtils.FirstUpc(x.rank)}
-									</span>
-								</>
-							) : (
-								<Skeleton width={50} />
-							)}
-						</div>
-					</div>
 					<ItemRender
-						title="Username"
-						info={x && x.payment.username}
+						title="Roles"
+						info={x && x.roles}
+						colorInfo={'confirmbgc status'}
 					/>
-					<ItemRender title="Email" info={x && x.payment.email} />
-					<ItemRender title="Rule" info={x && x.payment.rule} />
-					<ItemRender
-						bankInfo
-						title="Bank Name"
-						methodBank={x && x.payment.bank.bankName}
-						nameAccount={x && x.payment.bank.name}
-						numberAccount={x && x.payment.bank.account}
-					/>
-					<ItemRender feeCustom title="Fee" info={x && x.fee} />
-					<ItemRender
-						title="Deposits"
-						info={x && numberUtils.formatUSD(x.Wallet.deposit)}
-					/>
-					<ItemRender
-						title="Withdraw"
-						info={x && numberUtils.formatUSD(x.Wallet.withdraw)}
-					/>
-					<ItemRender
-						title="Balance"
-						info={x && numberUtils.formatUSD(x.Wallet.balance)}
-					/>
-					<ItemRender
-						title="Commision"
-						info={
-							x && numberUtils.formatUSD(x.Wallet.commission || 0)
-						}
-					/>
+					<ItemRender title="Email" info={x && x.email} />
+					<ItemRender title="chatIdLogin" info={x && x.chatIdLogin} />
+					<ItemRender title="Point" info={x && x.point} />
 					<ItemRender
 						title="Created At"
 						info={
@@ -339,52 +245,6 @@ function UserDetail() {
 					/>
 				</div>
 				<div className={`${cx('detail-container')}`}>
-					<div className="detail-item align-flex-end p0">
-						<FormInput
-							type="text"
-							name="fee"
-							placeholder="Fee"
-							classNameInput={`${cx('fee-input')}`}
-							label="Change Fee"
-							value={feeValue}
-							onChange={changeFee}
-						/>
-						<Button
-							onClick={() => updateFee(idUser)}
-							className={`${cx('btn')} vipbgc`}
-							disabled={!feeValue || isProcessFee}
-							isProcess={isProcessFee}
-						>
-							Update
-						</Button>
-					</div>
-					<div className="w100">
-						<SelectValue
-							isFormInput
-							label="Change Coin"
-							nameSearch="coin"
-							toggleModal={toggleListCoin}
-							stateModal={selectStatus}
-							valueSelect={changeCoin}
-							onChangeSearch={searchSelect}
-							dataFlag={DataCoinFlag}
-							onClick={handleChangeCoin}
-							valueFormInput={quantityCoin}
-							onChangeFormInput={changeQuantity}
-						/>
-						<div className="detail-item justify-flex-end">
-							<Button
-								onClick={() => updateCoin(idUser)}
-								className="vipbgc"
-								disabled={
-									(!coin && !quantityCoin) || isProcessCoin
-								}
-								isProcess={isProcessCoin}
-							>
-								Change
-							</Button>
-						</div>
-					</div>
 					<div className={`${cx('document-user-container')} w100`}>
 						<ImageDocumentRender
 							label="1. Citizen Identification"
@@ -416,28 +276,24 @@ function UserDetail() {
 					</Button>
 					<Button
 						className={`${cx('btn')} cancelbgc`}
-						onClick={
-							x?.blockUser
-								? () => onUnblockUser(idUser)
-								: () => onBlockUser(idUser)
-						}
+						onClick={onBlockUser}
 						isProcess={isProcessBlockUser}
 						disabled={isProcessBlockUser}
 					>
 						<div className="flex-center">
-							{!x?.blockUser ? (
+							{!x?.Lock ? (
 								<Icons.BlockUserIcon />
 							) : (
 								<Icons.UnBlockUserIcon />
 							)}{' '}
 							<span className="ml8">
-								{!x?.blockUser ? 'Block User' : 'Unblock User'}
+								{!x?.Lock ? 'Block User' : 'Unblock User'}
 							</span>
 						</div>
 					</Button>
 					<Button
 						className={`${cx('btn')} confirmbgc`}
-						onClick={() => refreshPwd(idUser)}
+						onClick={refreshPwd}
 						isProcess={isProcessRefreshPwd}
 						disabled={isProcessRefreshPwd}
 					>
@@ -471,7 +327,7 @@ function UserDetail() {
 					closeModal={modalChangePwdFalse}
 					openModal={modalChangePwdTrue}
 					classNameButton="vipbgc"
-					onClick={() => changePwd(idUser)}
+					onClick={changePwd}
 					isProcess={isProcessChangePwd}
 				>
 					<FormInput

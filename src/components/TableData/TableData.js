@@ -75,7 +75,8 @@ function TableData({
 	endPagiCus,
 	dataPagiCus,
 }) {
-	const { name, index, h1, h2, h3, h4, h5, h6, h7 } = headers;
+	const { name, index, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12 } =
+		headers;
 	const { state, dispatch } = useAppContext();
 	const { show, page } = state.set.pagination;
 	const { sort } = state.set;
@@ -233,6 +234,11 @@ function TableData({
 						<Thead item={h5} />
 						<Thead item={h6} />
 						<Thead item={h7} />
+						<Thead item={h8} />
+						<Thead item={h9} />
+						<Thead item={h10} />
+						<Thead item={h11} />
+						<Thead item={h12} />
 						{!noActions && <th></th>}
 					</tr>
 				</thead>

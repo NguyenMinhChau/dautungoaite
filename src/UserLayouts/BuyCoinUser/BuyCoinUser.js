@@ -13,8 +13,6 @@ import {
 	requestRefreshToken,
 	useAppContext,
 } from '../../utils';
-import { actions } from '../../app/';
-import { handleBuyCoin } from '../../services/coins';
 
 const cx = className.bind(styles);
 

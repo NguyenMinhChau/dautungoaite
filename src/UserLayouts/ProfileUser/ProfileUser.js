@@ -19,7 +19,6 @@ import { actions } from '../../app/';
 import ChangePwdUser from '../ChangePwdUser/ChangePwdUser';
 import ProfilePaymentUser from '../ProfilePaymentUser/ProfilePaymentUser';
 import UploadDocumentUser from '../UploadDocumentUser/UploadDocumentUser';
-import { searchBankAdminUser } from '../../services/coins';
 
 const cx = className.bind(styles);
 
@@ -194,10 +193,7 @@ export default function ProfileUser() {
 		(e) => {},
 		[formProfilePayment, bankValue],
 	);
-	const dataBankFlag = searchBankAdminUser({
-		bank,
-		data: dataBank,
-	});
+	const dataBankFlag = [];
 	return (
 		<>
 			<Button

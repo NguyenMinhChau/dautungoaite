@@ -13,8 +13,12 @@ import {
 	textUtils,
 	refreshPage,
 	numberUtils,
+	requestRefreshToken,
 } from '../../utils';
 import styles from './DepositsWithdrawDetail.module.css';
+import { formatUSD } from '../../utils/format/FormatMoney';
+import { getDepositByIdSV } from '../../services/deposits';
+import { actions } from '../../app/';
 
 const cx = className.bind(styles);
 
@@ -22,7 +26,7 @@ function DepositsWithdrawDetail() {
 	const { idDeposits, idWithdraw } = useParams();
 	const { state, dispatch } = useAppContext();
 	const location = useLocation();
-	const { edit } = state.set;
+	const { edit, currentUser } = state.set;
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		type: '',
@@ -37,12 +41,24 @@ function DepositsWithdrawDetail() {
 			open: false,
 		});
 	};
+	const getDPWRById = (dataToken) => {
+		if (idDeposits) {
+			getDepositByIdSV({
+				idDeposits,
+				token: dataToken?.token,
+				dispatch,
+				setSnackbar,
+			});
+		}
+	};
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
+		requestRefreshToken(currentUser, getDPWRById, state, dispatch, actions);
 	}, []);
 	function ItemRender({
 		title,
 		info,
+		colorInfo,
 		bankInfo,
 		methodBank,
 		nameAccount,
@@ -83,7 +99,7 @@ function DepositsWithdrawDetail() {
 							</span>
 						</div>
 					) : (
-						<span className="info">
+						<span className={`info ${colorInfo}`}>
 							{info || info === 0 ? (
 								info
 							) : (
@@ -96,6 +112,8 @@ function DepositsWithdrawDetail() {
 		);
 	}
 	const x = edit?.itemData;
+	const pathImage = x?.pathImage?.split('/');
+	const nameDocument = pathImage?.[pathImage?.length - 1];
 	const URL_SERVER =
 		process.env.REACT_APP_TYPE === 'development'
 			? process.env.REACT_APP_URL_SERVER
@@ -142,11 +160,14 @@ function DepositsWithdrawDetail() {
 						</div>
 					</div>
 					<ItemRender
-						title="Username"
-						info={x && x.method.accountName}
+						title="IdUser"
+						info={x && x.IdUser}
+						colorInfo={`status vipbgc`}
 					/>
-					<ItemRender title="Email" info={x && x.user} />
-					<ItemRender title="Code" info={x && x.code} />
+					<ItemRender
+						title="Quantity"
+						info={x && formatUSD(x.quantity || 0)}
+					/>
 					<ItemRender
 						title="Created"
 						info={
@@ -154,15 +175,7 @@ function DepositsWithdrawDetail() {
 							moment(x.createdAt).format('DD/MM/YYYY HH:mm:ss')
 						}
 					/>
-					<ItemRender
-						title="Amount USDT"
-						info={x && numberUtils.formatUSD(x.amount)}
-					/>
-					<ItemRender
-						title="Amount VND"
-						info={x && numberUtils.formatVND(x.amountVnd)}
-					/>
-					<ItemRender title="Symbol" info={x && x.symbol} />
+					{/*
 					<ItemRender
 						title="Payment method"
 						bankInfo
@@ -181,18 +194,21 @@ function DepositsWithdrawDetail() {
 								? x?.method?.accountNumber
 								: x?.bankAdmin?.accountNumber
 						}
-					/>
+					/> */}
 					{idDeposits && (
 						<ItemRender
 							title="Document"
 							info={
 								x && (
 									<a
-										href={`${URL_SERVER}${x?.statement}`}
+										href={`${URL_SERVER}/${x?.pathImage}`}
 										target="_blank"
 									>
-										{x.statement ? (
-											x.statement.replace('/images/', '')
+										{x.pathImage ? (
+											nameDocument?.replace(
+												'/images/',
+												'',
+											)
 										) : (
 											<Skeleton width="30px" />
 										)}
@@ -208,11 +224,11 @@ function DepositsWithdrawDetail() {
 							<div className={`${cx('document-review-title')}`}>
 								Document Review
 							</div>
-							{x?.statement ? (
+							{x?.pathImage ? (
 								<div className={`${cx('document-container')}`}>
 									<Image
-										src={`${URL_SERVER}/${x?.statement}`}
-										alt={x.statement.replace(
+										src={`${URL_SERVER}/${x?.pathImage}`}
+										alt={x.pathImage.replace(
 											'/images/',
 											'',
 										)}
