@@ -30,7 +30,6 @@ export const getAllAccountSV = async (props = {}) => {
 		});
 	}
 };
-// ADMIN KHÔNG CHO TẠO?
 export const createAccountSV = async (props = {}) => {
 	const {
 		username,
@@ -111,7 +110,6 @@ export const getAccountByIdSV = async (props = {}) => {
 		});
 	}
 };
-// UPDATE SUCCESS NHƯNG KHÔNG LƯU DATABASE
 export const updateAccountSV = async (props = {}) => {
 	const {
 		idAccount,
@@ -127,7 +125,7 @@ export const updateAccountSV = async (props = {}) => {
 	try {
 		const resPut = await adminPut(
 			`account/${idAccount}`,
-			{ body },
+			{ ...body },
 			{ headers: { Authorization: `Bearer ${token}` } },
 		);
 		const resGet = await adminGet('account', {
