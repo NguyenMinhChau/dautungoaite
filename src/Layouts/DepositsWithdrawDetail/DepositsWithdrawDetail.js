@@ -19,6 +19,7 @@ import styles from './DepositsWithdrawDetail.module.css';
 import { formatUSD } from '../../utils/format/FormatMoney';
 import { getDepositByIdSV } from '../../services/deposits';
 import { actions } from '../../app/';
+import { getWithdrawByIdSV } from '../../services/withdraws';
 
 const cx = className.bind(styles);
 
@@ -49,12 +50,20 @@ function DepositsWithdrawDetail() {
 				dispatch,
 				setSnackbar,
 			});
+		} else {
+			getWithdrawByIdSV({
+				idWithdraw,
+				token: dataToken?.token,
+				dispatch,
+				setSnackbar,
+			});
 		}
 	};
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
 		requestRefreshToken(currentUser, getDPWRById, state, dispatch, actions);
 	}, []);
+
 	function ItemRender({
 		title,
 		info,
@@ -112,6 +121,7 @@ function DepositsWithdrawDetail() {
 		);
 	}
 	const x = edit?.itemData;
+	console.log(x);
 	const pathImage = x?.pathImage?.split('/');
 	const nameDocument = pathImage?.[pathImage?.length - 1];
 	const URL_SERVER =

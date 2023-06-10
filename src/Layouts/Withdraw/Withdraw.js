@@ -16,7 +16,7 @@ import {
 import routers from '../../routers/routers';
 import { Icons, ActionsTable, Modal, SelectStatus } from '../../components';
 import { actions } from '../../app/';
-import { General } from '../';
+import { General } from '..';
 import {
 	TrObjectIcon,
 	TrObjectNoIcon,
@@ -24,6 +24,12 @@ import {
 } from '../../components/TableData/TableData';
 import styles from './Withdraw.module.css';
 import Skeleton from 'react-loading-skeleton';
+import {
+	deleteWithdrawsSV,
+	getAllWithdrawsSV,
+	updateWithdrawsSV,
+} from '../../services/withdraws';
+import { formatUSD } from '../../utils/format/FormatMoney';
 
 const cx = className.bind(styles);
 
@@ -45,8 +51,19 @@ function Withdraw() {
 		type: '',
 		message: '',
 	});
+	const gellWr = (dataToken) => {
+		// getAllWithdrawsSV({})
+		getAllWithdrawsSV({
+			token: dataToken.token,
+			dispatch,
+			state,
+			setSnackbar,
+		});
+	};
+	console.log(dataWithdraw);
 	useEffect(() => {
 		document.title = `Withdraw | ${process.env.REACT_APP_TITLE_WEB}`;
+		requestRefreshToken(currentUser, gellWr, state, dispatch, actions);
 	}, []);
 	const handleCloseSnackbar = (event, reason) => {
 		if (reason === 'clickaway') {
@@ -70,7 +87,7 @@ function Withdraw() {
 		}
 	}, [useBebounceWithdraw]);
 	useEffect(() => {}, [page, show, useBebounceWithdraw]);
-	let dataWithdrawFlag = dataWithdraw?.data?.withdraws || dataWithdraw?.data;
+	let dataWithdrawFlag = dataWithdraw || [];
 	// Modal
 	const toggleEditTrue = async (e, status, id) => {
 		await localStoreUtils.setStore({
@@ -89,8 +106,52 @@ function Withdraw() {
 		return deleteUtils.deleteFalse(e, dispatch, state, actions);
 	};
 	// Edit + Delete Withdraw
-	const deleteWithdraw = (id) => {};
-	const editStatus = (id) => {};
+
+	const handleDelete = (dataToken, id) => {
+		deleteWithdrawsSV({
+			idWithdraw: id,
+			token: dataToken.token,
+			setIsProcess,
+			dispatch,
+			state,
+			setSnackbar,
+		});
+	};
+
+	const deleteWithdraw = (id) => {
+		requestRefreshToken(
+			currentUser,
+			handleDelete,
+			state,
+			dispatch,
+			actions,
+			id,
+		);
+	};
+
+	const handleStatus = (dataToken, id) => {
+		updateWithdrawsSV({
+			idWithdraw: id,
+			token: dataToken.token,
+			statusUpdate,
+			statusCurrent,
+			setIsProcess,
+			dispatch,
+			state,
+			setSnackbar,
+		});
+	};
+
+	const editStatus = (id) => {
+		requestRefreshToken(
+			currentUser,
+			handleStatus,
+			state,
+			dispatch,
+			actions,
+			id,
+		);
+	};
 	const handleViewWithdraw = (item) => {
 		dispatch(
 			actions.setData({
@@ -102,63 +163,39 @@ function Withdraw() {
 		return (
 			<>
 				{data.map((item, index) => {
-					const sendReceived = {
-						send: {
-							icon: <Icons.SendIcon />,
-							title: 'Send',
-							number: numberUtils.formatUSD(item?.amountUsd),
-						},
-						received: {
-							icon: <Icons.ReceivedIcon />,
-							title: 'Received',
-							number: numberUtils.formatVND(item?.amountVnd),
-						},
-					};
-					const username = dataUser.dataUser.find(
-						(x) => x?.payment.email === item.user,
-					)?.payment.username;
-					const infoUser = {
-						name: username,
-						email: item.user,
-						path: `@${username?.replace(' ', '-')}`,
-					};
+					const username = dataUser.find(
+						(x) => x?.id === item.IdUser,
+					)?.email;
 					return (
 						<tr key={index}>
 							<td>{handleUtils.indexTable(page, show, index)}</td>
-							<td className="item-w100">{item.code}</td>
-							<td>
-								<TrObjectIcon item={sendReceived} />
+							<td className="item-w200">
+								{username || <Skeleton width={50} />}
 							</td>
-							<td className="item-w150">
-								<TrObjectNoIcon item={infoUser} />
+							<td className="item-w100">
+								{formatUSD(item?.quantity || 0) || (
+									<Skeleton width={50} />
+								)}
 							</td>
 							<td className="item-w100">
 								{moment(item.createdAt).format(
 									'DD/MM/YYYY HH:mm:ss',
 								)}
 							</td>
-							<td className="item-w150">
-								{item?.createBy ? (
-									item?.createBy
-								) : (
-									<Skeleton width={50} />
-								)}
-							</td>
 							<td>
 								<TrStatus
 									item={item.status}
 									onClick={(e) =>
-										toggleEditTrue(e, item.status, item._id)
+										toggleEditTrue(e, item.status, item.id)
 									}
 								/>
 							</td>
-
 							<td>
 								<ActionsTable
 									view
-									linkView={`${routers.withdraw}/${item._id}`}
+									linkView={`${routers.withdraw}/${item.id}`}
 									onClickDel={(e) =>
-										modalDeleteTrue(e, item._id)
+										modalDeleteTrue(e, item.id)
 									}
 									onClickView={() => handleViewWithdraw(item)}
 								></ActionsTable>
