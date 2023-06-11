@@ -2,6 +2,7 @@
 import { actions } from '../app/';
 import { adminDelete, adminGet, adminPut } from '../utils/Axios/axiosInstance';
 
+// WITHDRAWS
 export const getAllWithdrawsSV = async (props = {}) => {
 	const { token, dispatch, state, setSnackbar } = props;
 	try {

@@ -45,9 +45,8 @@ function Chat() {
 		});
 	};
 	useEffect(() => {
-		socket.on('get_messages', (data) => {
-			// setDataMessage(data);
-			setDataMessage((prev) => [...prev, data]);
+		socket.on(`get_messages_${from}`, (data) => {
+			setDataMessage(data);
 		});
 		if (dataMessage.length > 0) {
 			requestRefreshToken(
@@ -95,14 +94,6 @@ function Chat() {
 				to: to,
 				message: chat,
 			});
-			setDataMessage((prev) => [
-				...prev,
-				{
-					createdAt: new Date(),
-					email: currentUser?.email,
-					text: chat,
-				},
-			]);
 			requestRefreshToken(
 				currentUser,
 				getAllChat,
@@ -114,8 +105,8 @@ function Chat() {
 		}
 	};
 	const handleOnCopy = () => {};
-	const DATA_CHAT =
-		dataMessage.slice(dataMessage.length - 20, dataMessage.length) || [];
+	const DATA_CHAT = dataMessage || [];
+	// dataMessage.slice(dataMessage.length - 20, dataMessage.length) || [];
 	const clearChat = (dataToken) => {
 		clearChatSV({
 			setIsProcess,
@@ -158,75 +149,81 @@ function Chat() {
 							<>
 								{DATA_CHAT?.map((item, index) => {
 									return (
-										<div
-											className={`${cx(
-												'content_item',
-												// item?.idUser === idUser
-												(index + 1) % 2 === 0
-													? // !item?._id
-													  'right_align'
-													: 'left_align',
-											)}`}
-											key={index}
-											title={moment(
-												item?.createdAt,
-											).format('DD/MM/YYYY HH:mm:ss')}
+										<CopyToClipboard
+											text={item?.text}
+											onCopy={handleOnCopy}
 										>
 											<div
 												className={`${cx(
-													'content_item_text_image_container',
-												)} ${
-													(index + 1) % 2 === 0
+													'content_item',
+													// item?.idUser === idUser
+													(index + 1) % 2 !== 0
 														? // !item?._id
-														  'flex-end flex-row-reverse'
-														: 'flex-start'
-												}`}
+														  'right_align'
+														: 'left_align',
+												)}`}
+												key={index}
+												title={moment(
+													item?.createdAt,
+												).format('DD/MM/YYYY HH:mm:ss')}
 											>
-												<img
-													src={AVATAR_PLACEHOLDER}
-													alt=""
-													className={`${cx(
-														'content_item_image',
-													)} ${
-														(index + 1) % 2 === 0
-															? // !item?._id
-															  'ml8'
-															: 'mr8'
-													}`}
-												/>
 												<div
 													className={`${cx(
-														'content_item_text',
-													)}`}
-													dangerouslySetInnerHTML={{
-														__html: item?.text,
-													}}
-												></div>
-											</div>
-											<div
-												className={`${cx(
-													'content_item_time',
-												)}`}
-											>
-												<span>
-													{moment(
-														item?.createdAt,
-													).fromNow()}
-												</span>
-												<CopyToClipboard
-													text={item?.text}
-													onCopy={handleOnCopy}
+														'content_item_text_image_container',
+													)} ${
+														(index + 1) % 2 !== 0
+															? // !item?._id
+															  'flex-end flex-row-reverse'
+															: 'flex-start'
+													}`}
 												>
-													<span
+													<img
+														src={AVATAR_PLACEHOLDER}
+														alt=""
 														className={`${cx(
-															'icon_copy',
-														)} ml8`}
-													>
-														<i class="bx bx-copy-alt"></i>
+															'content_item_image',
+														)} ${
+															(index + 1) % 2 !==
+															0
+																? // !item?._id
+																  'ml8'
+																: 'mr8'
+														}`}
+													/>
+													<div
+														className={`${cx(
+															'content_item_text',
+														)}`}
+														dangerouslySetInnerHTML={{
+															__html: item?.text,
+														}}
+													></div>
+												</div>
+												<div
+													className={`${cx(
+														'content_item_time',
+													)}`}
+												>
+													<span>
+														{moment(
+															item?.createdAt,
+														).fromNow()}
 													</span>
-												</CopyToClipboard>
+													<CopyToClipboard
+														text={item?.text}
+														onCopy={handleOnCopy}
+													>
+														<span
+															className={`${cx(
+																'icon_copy',
+															)} ml8`}
+														>
+															<i class="bx bx-copy-alt"></i>
+														</span>
+													</CopyToClipboard>
+												</div>
 											</div>
-										</div>
+										</CopyToClipboard>
 									);
 								})}
 							</>
