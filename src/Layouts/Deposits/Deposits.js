@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -58,6 +59,9 @@ function Deposits() {
 		type: '',
 		message: '',
 	});
+	let showPage = 10;
+	const start = (page - 1) * showPage + 1;
+	const end = start + showPage - 1;
 	const getAllDP = (dataToken) => {
 		getAllDepositsSV({
 			token: dataToken?.token,
@@ -228,17 +232,24 @@ function Deposits() {
 				className={cx('deposits')}
 				valueSearch={deposits}
 				nameSearch="deposits"
-				dataFlag={dataDepositsFlag}
 				dataHeaders={DataDeposits(Icons).headers}
-				totalData={
-					dataDeposits?.total || dataDeposits?.data?.totalSearch
-				}
+				totalData={dataDeposits?.length}
 				handleCloseSnackbar={handleCloseSnackbar}
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
+				PaginationCus
+				startPagiCus={start}
+				endPagiCus={end}
+				dataPagiCus={dataDepositsFlag?.filter((row, index) => {
+					if (index + 1 >= start && index + 1 <= end) return true;
+				})}
 			>
-				<RenderBodyTable data={dataDepositsFlag} />
+				<RenderBodyTable
+					data={dataDepositsFlag?.filter((row, index) => {
+						if (index + 1 >= start && index + 1 <= end) return true;
+					})}
+				/>
 			</General>
 			{modalStatus && (
 				<Modal

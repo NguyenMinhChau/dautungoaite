@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -51,6 +52,9 @@ function Withdraw() {
 		type: '',
 		message: '',
 	});
+	let showPage = 10;
+	const start = (page - 1) * showPage + 1;
+	const end = start + showPage - 1;
 	const gellWr = (dataToken) => {
 		getAllWithdrawsSV({
 			token: dataToken.token,
@@ -59,7 +63,6 @@ function Withdraw() {
 			setSnackbar,
 		});
 	};
-	console.log(dataWithdraw);
 	useEffect(() => {
 		document.title = `Withdraw | ${process.env.REACT_APP_TITLE_WEB}`;
 		requestRefreshToken(currentUser, gellWr, state, dispatch, actions);
@@ -211,17 +214,24 @@ function Withdraw() {
 				className={cx('withdraw')}
 				valueSearch={withdraw}
 				nameSearch="withdraw"
-				dataFlag={dataWithdrawFlag}
 				dataHeaders={DataWithdraws(Icons).headers}
-				totalData={
-					dataWithdraw?.total || dataWithdraw?.data?.totalSearch
-				}
+				totalData={dataWithdraw?.length}
 				handleCloseSnackbar={handleCloseSnackbar}
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
+				PaginationCus={true}
+				startPagiCus={start}
+				endPagiCus={end}
+				dataPagiCus={dataWithdrawFlag?.filter((row, index) => {
+					if (index + 1 >= start && index + 1 <= end) return true;
+				})}
 			>
-				<RenderBodyTable data={dataWithdrawFlag} />
+				<RenderBodyTable
+					data={dataWithdrawFlag?.filter((row, index) => {
+						if (index + 1 >= start && index + 1 <= end) return true;
+					})}
+				/>
 			</General>
 			{modalStatus && (
 				<Modal

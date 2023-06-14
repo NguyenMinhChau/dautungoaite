@@ -237,7 +237,7 @@ function User() {
 				openSnackbar={snackbar.open}
 				typeSnackbar={snackbar.type}
 				messageSnackbar={snackbar.message}
-				PaginationCus={true}
+				PaginationCus
 				startPagiCus={start}
 				endPagiCus={end}
 				dataPagiCus={dataUserFlag?.filter((row, index) => {
