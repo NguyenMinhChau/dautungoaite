@@ -52,7 +52,6 @@ function Withdraw() {
 		message: '',
 	});
 	const gellWr = (dataToken) => {
-		// getAllWithdrawsSV({})
 		getAllWithdrawsSV({
 			token: dataToken.token,
 			dispatch,
