@@ -6,23 +6,23 @@ const DataAccounts = (Icons) => {
 				title: 'No',
 			},
 			h1: {
-				title: 'Account name',
-				iconSort: <i className="fa-solid fa-sort"></i>,
+				title: 'Type Acc',
 			},
 			h2: {
-				title: 'Username',
+				title: 'Account number',
+				iconSort: <i className="fa-solid fa-sort"></i>,
 			},
 			h3: {
-				title: 'Host',
+				title: 'Account name',
 			},
 			h4: {
-				title: 'Port',
-			},
-			h5: {
 				title: 'Server Broker',
 			},
+			h5: {
+				title: 'Host',
+			},
 			h6: {
-				title: 'Type Acc',
+				title: 'Port',
 			},
 			h7: {
 				title: 'Created At',

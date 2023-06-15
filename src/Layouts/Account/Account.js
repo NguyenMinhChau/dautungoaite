@@ -16,7 +16,7 @@ import {
 import routers from '../../routers/routers';
 import { actions } from '../../app/';
 import { General } from '..';
-import { Modal, ActionsTable, FormInput } from '../../components';
+import { Modal, ActionsTable, FormInput, SelectValue } from '../../components';
 import styles from './Account.module.css';
 import moment from 'moment';
 import {
@@ -27,6 +27,10 @@ import {
 
 const cx = className.bind(styles);
 const DATA_ACCOUNTS = DataAccounts();
+const DATA_TYPE_ACC = [
+	{ id: 1, value: 'MT4', label: 'MetaTrader 4' },
+	{ id: 2, value: 'MT5', label: 'MetaTrader 5' },
+];
 
 function Account() {
 	const { state, dispatch } = useAppContext();
@@ -73,6 +77,7 @@ function Account() {
 		type: '',
 		message: '',
 	});
+	const [toggleAcc, setToggleAcc] = useState(false);
 	let showPage = 10;
 	const start = (page - 1) * showPage + 1;
 	const end = start + showPage - 1;
@@ -102,6 +107,9 @@ function Account() {
 			...snackbar,
 			open: false,
 		});
+	};
+	const handleToggleAcc = () => {
+		setToggleAcc(!toggleAcc);
 	};
 	const useDebounceAccount = useDebounce(account, 500);
 	useEffect(() => {
@@ -244,23 +252,23 @@ function Account() {
 						<td className="upc">
 							{handleUtils.indexTable(page, show, index)}
 						</td>
+						<td className="item-w150">
+							{item.typeAcc || <Skeleton width={50} />}
+						</td>
+						<td className="item-w200">
+							{item.username || <Skeleton width={50} />}
+						</td>
 						<td className="item-w200">
 							{item.accountName || <Skeleton width={50} />}
 						</td>
-						<td className="item-w100">
-							{item.username || <Skeleton width={50} />}
+						<td className="item-w200">
+							{item.serverBroker || <Skeleton width={50} />}
 						</td>
 						<td className="item-w150">
 							{item.host || <Skeleton width={50} />}
 						</td>
 						<td className="item-w150">
 							{item.port || <Skeleton width={50} />}
-						</td>
-						<td className="item-w200">
-							{item.serverBroker || <Skeleton width={50} />}
-						</td>
-						<td className="item-w150">
-							{item.typeAcc || <Skeleton width={50} />}
 						</td>
 						<td className="item-w150">
 							{moment(item.createdAt).format(
@@ -343,12 +351,37 @@ function Account() {
 							: handleCreateAccount
 					}
 				>
+					<SelectValue
+						label="Add acc"
+						toggleModal={handleToggleAcc}
+						stateModal={toggleAcc}
+						valueSelect={typeAcc}
+						dataFlag={DATA_TYPE_ACC}
+						onChange={handleChangeCreateAccount}
+						onClick={(item) => {
+							setDataFormCreateAccount({
+								...dataFormCreateAccount,
+								typeAcc: item.value,
+							});
+							setToggleAcc(false);
+						}}
+						required
+					/>
 					<FormInput
-						label="Username"
+						label="Account number"
 						name="username"
 						value={username}
 						onChange={handleChangeCreateAccount}
-						placeholder="Enter username"
+						placeholder="Enter account number"
+						required
+					/>
+					<FormInput
+						label="Account name"
+						name="accountName"
+						value={accountName}
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter account name"
+						required
 					/>
 					<FormInput
 						label="Password"
@@ -357,6 +390,15 @@ function Account() {
 						onChange={handleChangeCreateAccount}
 						placeholder="Enter password"
 						showPwd
+						required
+					/>
+					<FormInput
+						label="Server broker"
+						name="serverBroker"
+						value={serverBroker}
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter server broker"
+						required
 					/>
 					<FormInput
 						label="Host"
@@ -372,59 +414,34 @@ function Account() {
 						onChange={handleChangeCreateAccount}
 						placeholder="Enter port"
 					/>
-					{isUpdateAccount && (
-						<>
-							<FormInput
-								label="Account name"
-								name="accountName"
-								value={accountName}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter account name"
-							/>
-							<FormInput
-								label="Proxy username"
-								name="proxyUsername"
-								value={proxyUsername}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter proxy username"
-							/>
-							<FormInput
-								label="Proxy password"
-								name="proxyPassword"
-								value={proxyPassword}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter proxy password"
-							/>
-							<FormInput
-								label="Proxy host"
-								name="proxyHost"
-								value={proxyHost}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter proxy host"
-							/>
-							<FormInput
-								label="Proxy port"
-								name="proxyPort"
-								value={proxyPort}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter proxy port"
-							/>
-							<FormInput
-								label="Server broker"
-								name="serverBroker"
-								value={serverBroker}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter server broker"
-							/>
-							<FormInput
-								label="Type Acc"
-								name="typeAcc"
-								value={typeAcc}
-								onChange={handleChangeCreateAccount}
-								placeholder="Enter type acc"
-							/>
-						</>
-					)}
+					<FormInput
+						label="Proxy username"
+						name="proxyUsername"
+						value={proxyUsername}
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter proxy username"
+					/>
+					<FormInput
+						label="Proxy password"
+						name="proxyPassword"
+						value={proxyPassword}
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter proxy password"
+					/>
+					<FormInput
+						label="Proxy host"
+						name="proxyHost"
+						value={proxyHost}
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter proxy host"
+					/>
+					<FormInput
+						label="Proxy port"
+						name="proxyPort"
+						value={proxyPort}
+						onChange={handleChangeCreateAccount}
+						placeholder="Enter proxy port"
+					/>
 				</Modal>
 			)}
 		</>
