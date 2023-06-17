@@ -15,17 +15,27 @@ import {
 } from '@mui/material';
 import { Logout, Settings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext, axiosUtils, numberUtils } from '../../utils';
+import {
+	useAppContext,
+	axiosUtils,
+	numberUtils,
+	requestRefreshToken,
+} from '../../utils';
 import { SnackbarCp } from '../';
 import { actions } from '../../app/';
 import styles from './AccountMenu.module.css';
 import { LogoutSV } from '../../services/authen';
+import { getUserByIdSV } from '../../services/users';
 
 const cx = className.bind(styles);
 
 function AccountMenu({ className }) {
 	const { state, dispatch } = useAppContext();
-	const { accountMenu, currentUser } = state.set;
+	const {
+		accountMenu,
+		currentUser,
+		edit: { itemData },
+	} = state.set;
 	const [user, setUser] = React.useState(null);
 	const [snackbar, setSnackbar] = useState({
 		open: false,
@@ -41,8 +51,19 @@ function AccountMenu({ className }) {
 			open: false,
 		});
 	};
-
-	React.useEffect(() => {}, []);
+	const getUser = (dataToken) => {
+		getUserByIdSV({
+			idUser: currentUser?.id,
+			token: dataToken?.token,
+			dispatch,
+			state,
+			setSnackbar,
+		});
+	};
+	React.useEffect(() => {
+		requestRefreshToken(currentUser, getUser, state, dispatch, actions);
+	}, []);
+	// console.log(itemData);
 	const open = Boolean(accountMenu);
 	const history = useNavigate();
 	const handleClickMenu = (e) => {
@@ -135,10 +156,9 @@ function AccountMenu({ className }) {
 					{currentUser?.email || '---'}
 				</MenuItem>
 				<Divider />
-				{/* <MenuItem>
-					Your Wallet:{' '}
-					{numberUtils.coinUSD(user?.Wallet?.balance || 0)}
-				</MenuItem> */}
+				<MenuItem>
+					Your Balance: {itemData?.balance || 0 + ' USDT'}
+				</MenuItem>
 				<MenuItem>
 					<ListItemIcon>
 						<Settings fontSize="small" />

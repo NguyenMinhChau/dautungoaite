@@ -175,9 +175,18 @@ function Withdraw() {
 								{username || <Skeleton width={50} />}
 							</td>
 							<td className="item-w100">
-								{formatUSD(item?.quantity || 0) || (
+								{item?.quantity || 0 || <Skeleton width={50} />}
+							</td>
+							<td className="item-w200">
+								{(item?.addressPayment &&
+								item?.addressPayment?.length > 50
+									? item?.addressPayment?.slice(0, 50) + '...'
+									: item?.addressPayment) || (
 									<Skeleton width={50} />
 								)}
+							</td>
+							<td className="item-w100">
+								{item?.gatePayment || <Skeleton width={50} />}
 							</td>
 							<td className="item-w100">
 								{moment(item.createdAt).format(

@@ -9,7 +9,7 @@ const DataDeposits = (Icons) => {
 				title: 'User email',
 			},
 			h2: {
-				title: 'Amount',
+				title: 'Amount (USDT)',
 			},
 			h3: {
 				title: 'Created At',

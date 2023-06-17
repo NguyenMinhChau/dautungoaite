@@ -193,7 +193,7 @@ function Deposits() {
 								{username || <Skeleton width={50} />}
 							</td>
 							<td className="item-w100">
-								{formatUSD(item?.quantity || 0) || (
+								{item?.quantity || 0 || (
 									<Skeleton width={50} />
 								)}
 							</td>

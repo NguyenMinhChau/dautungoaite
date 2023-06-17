@@ -75,7 +75,9 @@ function DepositsWithdrawDetail() {
 	}) {
 		return (
 			<div className="detail-item">
-				<div className="detail-title">{title}</div>
+				<div className="detail-title" style={{ marginRight: '8px' }}>
+					{title}
+				</div>
 				<div className={`${cx('detail-status')}`}>
 					{bankInfo ? (
 						<div
@@ -108,7 +110,9 @@ function DepositsWithdrawDetail() {
 							</span>
 						</div>
 					) : (
-						<span className={`info ${colorInfo}`}>
+						<span
+							className={`${cx('info_text')} info ${colorInfo}`}
+						>
 							{info || info === 0 ? (
 								info
 							) : (
@@ -176,8 +180,20 @@ function DepositsWithdrawDetail() {
 					/>
 					<ItemRender
 						title="Quantity"
-						info={x && formatUSD(x.quantity || 0)}
+						info={x && (x.quantity || 0) + ' USDT'}
 					/>
+					{idWithdraw && (
+						<>
+							<ItemRender
+								title="Receiving Wallet"
+								info={x && x?.addressPayment}
+							/>
+							<ItemRender
+								title="Gate Payment"
+								info={x && x?.gatePayment}
+							/>
+						</>
+					)}
 					<ItemRender
 						title="Created"
 						info={
