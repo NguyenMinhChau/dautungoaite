@@ -157,7 +157,7 @@ function AccountMenu({ className }) {
 				</MenuItem>
 				<Divider />
 				<MenuItem>
-					Your Balance: {itemData?.balance || 0 + ' USDT'}
+					Your Balance: {itemData?.point || 0 + ' USDT'}
 				</MenuItem>
 				<MenuItem>
 					<ListItemIcon>
