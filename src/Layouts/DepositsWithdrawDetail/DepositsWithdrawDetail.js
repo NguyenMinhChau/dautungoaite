@@ -157,12 +157,12 @@ function DepositsWithdrawDetail() {
 								<>
 									<span
 										className={`status fwb ${
-											x.status
-												.toLowerCase()
-												.replace(' ', '') + 'bgc'
+											x?.status
+												?.toLowerCase()
+												?.replace(' ', '') + 'bgc'
 										}`}
 									>
-										{textUtils.FirstUpc(x.status)}
+										{textUtils.FirstUpc(x?.status)}
 									</span>
 								</>
 							) : (
@@ -172,7 +172,7 @@ function DepositsWithdrawDetail() {
 					</div>
 					<ItemRender
 						title="IdUser"
-						info={x && x.IdUser}
+						info={x && x?.IdUser}
 						colorInfo={`status vipbgc`}
 					/>
 					<ItemRender
@@ -195,7 +195,7 @@ function DepositsWithdrawDetail() {
 						title="Created"
 						info={
 							x &&
-							moment(x.createdAt).format('DD/MM/YYYY HH:mm:ss')
+							moment(x?.createdAt).format('DD/MM/YYYY HH:mm:ss')
 						}
 					/>
 					{/*
@@ -228,7 +228,7 @@ function DepositsWithdrawDetail() {
 										target="_blank"
 										rel="noreferrer"
 									>
-										{x.pathImage ? (
+										{x?.pathImage ? (
 											nameDocument?.replace(
 												'/images/',
 												'',
@@ -252,7 +252,7 @@ function DepositsWithdrawDetail() {
 								<div className={`${cx('document-container')}`}>
 									<Image
 										src={`${URL_SERVER}/${x?.pathImage}`}
-										alt={x.pathImage.replace(
+										alt={x?.pathImage.replace(
 											'/images/',
 											'',
 										)}

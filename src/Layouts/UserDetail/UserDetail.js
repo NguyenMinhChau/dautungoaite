@@ -230,17 +230,20 @@ function UserDetail() {
 				<div className={`${cx('detail-container')}`}>
 					<ItemRender
 						title="Roles"
-						info={x && x.roles}
+						info={x && x?.roles}
 						colorInfo={'confirmbgc status'}
 					/>
-					<ItemRender title="Email" info={x && x.email} />
-					<ItemRender title="chatIdLogin" info={x && x.chatIdLogin} />
-					<ItemRender title="Point" info={x && x.point} />
+					<ItemRender title="Email" info={x && x?.email} />
+					<ItemRender
+						title="chatIdLogin"
+						info={x && x?.chatIdLogin}
+					/>
+					<ItemRender title="Point" info={x && x?.point} />
 					<ItemRender
 						title="Created At"
 						info={
 							x &&
-							moment(x.createdAt).format('DD/MM/YYYY HH:mm:ss')
+							moment(x?.createdAt).format('DD/MM/YYYY HH:mm:ss')
 						}
 					/>
 				</div>
