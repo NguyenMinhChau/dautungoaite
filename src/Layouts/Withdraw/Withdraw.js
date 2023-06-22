@@ -30,7 +30,7 @@ import {
 	getAllWithdrawsSV,
 	updateWithdrawsSV,
 } from '../../services/withdraws';
-import { formatUSD } from '../../utils/format/FormatMoney';
+import { formatMoneyUSDT } from '../../utils/format/NumberFormat';
 
 const cx = className.bind(styles);
 
@@ -168,6 +168,9 @@ function Withdraw() {
 					const username = dataUser.find(
 						(x) => x?.id === item.IdUser,
 					)?.email;
+					const quantity = item?.quantity?.toString().includes('.')
+						? item?.quantity?.toString()
+						: formatMoneyUSDT(item?.quantity?.toString());
 					return (
 						<tr key={index}>
 							<td>{handleUtils.indexTable(page, show, index)}</td>
@@ -175,7 +178,7 @@ function Withdraw() {
 								{username || <Skeleton width={50} />}
 							</td>
 							<td className="item-w100">
-								{item?.quantity || 0 || <Skeleton width={50} />}
+								{quantity || 0 || <Skeleton width={50} />}
 							</td>
 							<td className="item-w200">
 								{(item?.addressPayment &&

@@ -1,9 +1,6 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import className from 'classnames/bind';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Button, Icons, Image, SnackbarCp } from '../../components';
@@ -12,11 +9,10 @@ import {
 	useAppContext,
 	textUtils,
 	refreshPage,
-	numberUtils,
 	requestRefreshToken,
 } from '../../utils';
 import styles from './DepositsWithdrawDetail.module.css';
-import { formatUSD } from '../../utils/format/FormatMoney';
+import { formatMoneyUSDT } from '../../utils/format/NumberFormat';
 import { getDepositByIdSV } from '../../services/deposits';
 import { actions } from '../../app/';
 import { getWithdrawByIdSV } from '../../services/withdraws';
@@ -26,7 +22,6 @@ const cx = className.bind(styles);
 function DepositsWithdrawDetail() {
 	const { idDeposits, idWithdraw } = useParams();
 	const { state, dispatch } = useAppContext();
-	const location = useLocation();
 	const { edit, currentUser } = state.set;
 	const [snackbar, setSnackbar] = useState({
 		open: false,
@@ -62,7 +57,7 @@ function DepositsWithdrawDetail() {
 	useEffect(() => {
 		document.title = `Detail | ${process.env.REACT_APP_TITLE_WEB}`;
 		requestRefreshToken(currentUser, getDPWRById, state, dispatch, actions);
-	}, []);
+	}, [currentUser, dispatch, state]);
 
 	function ItemRender({
 		title,
@@ -125,7 +120,9 @@ function DepositsWithdrawDetail() {
 		);
 	}
 	const x = edit?.itemData;
-	console.log(x);
+	const quantity = x?.quantity?.toString().includes('.')
+		? x?.quantity?.toString()
+		: formatMoneyUSDT(x?.quantity?.toString());
 	const pathImage = x?.pathImage?.split('/');
 	const nameDocument = pathImage?.[pathImage?.length - 1];
 	const URL_SERVER =
@@ -180,7 +177,7 @@ function DepositsWithdrawDetail() {
 					/>
 					<ItemRender
 						title="Quantity"
-						info={x && (x.quantity || 0) + ' USDT'}
+						info={x && (quantity || 0) + ' USDT'}
 					/>
 					{idWithdraw && (
 						<>
@@ -229,6 +226,7 @@ function DepositsWithdrawDetail() {
 									<a
 										href={`${URL_SERVER}/${x?.pathImage}`}
 										target="_blank"
+										rel="noreferrer"
 									>
 										{x.pathImage ? (
 											nameDocument?.replace(
