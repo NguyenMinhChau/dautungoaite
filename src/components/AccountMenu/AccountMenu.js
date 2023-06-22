@@ -15,17 +15,13 @@ import {
 } from '@mui/material';
 import { Logout, Settings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import {
-	useAppContext,
-	axiosUtils,
-	numberUtils,
-	requestRefreshToken,
-} from '../../utils';
+import { useAppContext, requestRefreshToken } from '../../utils';
 import { SnackbarCp } from '../';
 import { actions } from '../../app/';
 import styles from './AccountMenu.module.css';
 import { LogoutSV } from '../../services/authen';
 import { getUserByIdSV } from '../../services/users';
+import { formatMoneyUSDT } from '../../utils/format/NumberFormat';
 
 const cx = className.bind(styles);
 
@@ -157,7 +153,8 @@ function AccountMenu({ className }) {
 				</MenuItem>
 				<Divider />
 				<MenuItem>
-					Your Balance: {itemData?.point || 0 + ' USDT'}
+					Your Balance:{' '}
+					{formatMoneyUSDT(itemData?.point) || 0 + ' USDT'}
 				</MenuItem>
 				<MenuItem>
 					<ListItemIcon>

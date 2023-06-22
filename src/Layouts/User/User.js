@@ -26,6 +26,7 @@ import {
 	updateUserSV,
 	deleteUserSV,
 } from '../../services/users';
+import { formatMoneyUSDT } from '../../utils/format/NumberFormat';
 
 const cx = className.bind(styles);
 const DATA_USERS = DataUsers();
@@ -184,44 +185,53 @@ function User() {
 	function RenderBodyTable({ data }) {
 		return (
 			<>
-				{data.map((item, index) => (
-					<tr key={index}>
-						<td className="upc">
-							{handleUtils.indexTable(page, show, index)}
-						</td>
-						<td className="item-w200">
-							{item.email || <Skeleton width={50} />}
-						</td>
-						<td className="item-w10">
-							{item.chatIdLogin || <Skeleton width={50} />}
-						</td>
-						<td className="item-w150">{item.point || 0}</td>
-						<td className="item-w150">
-							{moment(item.createdAt).format(
-								'DD/MM/YYYY HH:mm:ss',
-							) || <Skeleton width={30} />}
-						</td>
-						<td>
-							<TrStatus
-								item={
-									item.roles.charAt(0).toUpperCase() +
-									item.roles.slice(1).toLowerCase()
-								}
-								onClick={(e) =>
-									toggleEditRolesTrue(e, item.roles, item.id)
-								}
-							/>
-						</td>
-						<td>
-							<ActionsTable
-								view
-								linkView={`${routers.user}/${item.id}`}
-								onClickView={() => handleViewUser(item)}
-								onClickDel={(e) => modalDeleteTrue(e, item.id)}
-							></ActionsTable>
-						</td>
-					</tr>
-				))}
+				{data.map((item, index) => {
+					const balance = formatMoneyUSDT(item?.point?.toString());
+					return (
+						<tr key={index}>
+							<td className="upc">
+								{handleUtils.indexTable(page, show, index)}
+							</td>
+							<td className="item-w200">
+								{item.email || <Skeleton width={50} />}
+							</td>
+							<td className="item-w10">
+								{item.chatIdLogin || <Skeleton width={50} />}
+							</td>
+							<td className="item-w150">{balance || 0}</td>
+							<td className="item-w150">
+								{moment(item.createdAt).format(
+									'DD/MM/YYYY HH:mm:ss',
+								) || <Skeleton width={30} />}
+							</td>
+							<td>
+								<TrStatus
+									item={
+										item.roles.charAt(0).toUpperCase() +
+										item.roles.slice(1).toLowerCase()
+									}
+									onClick={(e) =>
+										toggleEditRolesTrue(
+											e,
+											item.roles,
+											item.id,
+										)
+									}
+								/>
+							</td>
+							<td>
+								<ActionsTable
+									view
+									linkView={`${routers.user}/${item.id}`}
+									onClickView={() => handleViewUser(item)}
+									onClickDel={(e) =>
+										modalDeleteTrue(e, item.id)
+									}
+								></ActionsTable>
+							</td>
+						</tr>
+					);
+				})}
 			</>
 		);
 	}
